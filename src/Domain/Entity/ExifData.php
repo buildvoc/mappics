@@ -35,6 +35,17 @@ class ExifData
     /** @var \DateTimeImmutable|null */
     private $takenAt;
 
+    /** @var float|null */
+    private $gpsImgDirection;
+
+    /** @var string|null */
+    private $gpsLatitudeRef;
+
+    /** @var string|null */
+    private $gpsLongitudeRef;
+
+    private $focalLengthIn35mmFilm;
+
     public function __construct(
         ?float $latitude,
         ?float $longitude,
@@ -45,7 +56,11 @@ class ExifData
         ?string $aperture,
         ?string $focalLength,
         ?string $ISO,
-        ?\DateTimeImmutable $takenAt
+        ?float $gpsImgDirection,
+        ?\DateTimeImmutable $takenAt,
+        $focalLengthIn35mmFilm,
+        ?string $gpsLatitudeRef,
+        ?string $gpsLongitudeRef
     ) {
         $this->latitude = $latitude;
         $this->longitude = $longitude;
@@ -56,7 +71,12 @@ class ExifData
         $this->aperture = $aperture;
         $this->focalLength = $focalLength;
         $this->ISO = $ISO;
+        $this->gpsImgDirection = $gpsImgDirection;
         $this->takenAt = $takenAt;
+        $this->gpsLatitudeRef = $gpsLatitudeRef;
+        $this->gpsLongitudeRef = $gpsLongitudeRef;
+        $this->focalLengthIn35mmFilm = $focalLengthIn35mmFilm;
+
     }
 
     public function setLatitude(?float $latitude): void
@@ -72,6 +92,23 @@ class ExifData
     public function setTakenAt(?\DateTimeImmutable $takenAt): void
     {
         $this->takenAt = $takenAt;
+    }
+    public function setGpsImgDirection(?float $gpsImgDirection): void
+    {
+        $this->gpsImgDirection = $gpsImgDirection;
+    }
+
+    public function setGpsLatitudeRef(?string $gpsLatitudeRef): void
+    {
+        $this->gpsLatitudeRef = $gpsLatitudeRef;
+    }
+    public function setGpsLongitudeRef(?float $gpsLongitudeRef): void
+    {
+        $this->gpsLongitudeRef = $gpsLongitudeRef;
+    }
+    public function setFocalLengthIn35mmFilm( $focalLengthIn35mmFilm): void
+    {
+        $this->focalLengthIn35mmFilm = $focalLengthIn35mmFilm;
     }
 
     public function getLatitude(): ?float
@@ -102,6 +139,26 @@ class ExifData
     public function getTakenAt(): ?\DateTimeImmutable
     {
         return $this->takenAt;
+    }
+
+    public function getGpsImgDirection(): ?float
+    {
+        return (float) $this->gpsImgDirection;
+    }
+
+    public function getGpsLatitudeRef(): ?string
+    {
+       return (string) $this->gpsLatitudeRef;
+    }
+
+    public function getGpsLongitudeRef(): ?string
+    {
+       return (string) $this->gpsLongitudeRef;
+    }
+
+    public function getFocalLengthIn35mmFilm()
+    {
+        return $this->focalLengthIn35mmFilm;
     }
 
     public function getExposure(): ?string

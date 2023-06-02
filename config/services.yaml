@@ -1,4 +1,6 @@
 parameters:
+    geojson_path: '%kernel.project_dir%/var/geojson'
+    geojson_3d_path: '%kernel.project_dir%/var/geojson/3DBuildings_edited'
     galleries_path: '%kernel.project_dir%/var/galleries'
     public_galleries_path: '%kernel.project_dir%/public/galleries'
     image_files_extensions:
@@ -20,6 +22,8 @@ services:
     App\Infrastructure\Controller\MappicsController:
         arguments:
             $mapboxApiKey: '%mapbox_api_key%'
+            $geojsonPath: '%geojson_path%'
+            $geojson3dPath: '%geojson_3d_path%'
         tags: ['controller.service_arguments']
 
     App\Infrastructure\Repository\DoctrineGalleryRepository:

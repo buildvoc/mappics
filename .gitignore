@@ -2,7 +2,6 @@
 .env
 /public/bundles/
 /var/
-/vendor/
 ###< symfony/framework-bundle ###
 /public/galleries/*
 !/public/galleries/.keep
