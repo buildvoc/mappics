@@ -1,6 +1,8 @@
 var mapElement = document.getElementById('map');
 var mapboxApiKey = mapElement.dataset.mapboxapikey;
 var parsed3dbuildings = JSON.parse(mapElement.dataset.buildings);
+// var imgcontents = JSON.parse(mapElement.dataset.imgcontentarray);
+
 $('.info').css('top', '0');
 $('.info').css('left', '30%');
 
@@ -11,7 +13,8 @@ var draw = new MapboxDraw({
 mapboxgl.accessToken = 'pk.eyJ1Ijoibm91ZmVsZ2hheWF0aSIsImEiOiJja3lmNWwwemEwOXNuMnhxcm9qNDF2ZXRhIn0.n0EDO6c611aAGh4r9-FwSg';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'https://api.os.uk/maps/vector/v1/vts/resources/styles?key=' + mapboxApiKey,
+    // style: 'https://api.os.uk/maps/vector/v1/vts/resources/styles?key=' + mapboxApiKey,
+    style: 'https://api.os.uk/maps/vector/v1/vts/resources/styles?key=wCujufkC5D7bjVRTf5goHOSQSu8lLAbT',
     center: [-0.098136, 51.513813],
     zoom: 16.5,
     maxPitch: 85,
@@ -427,6 +430,7 @@ map.on('load', async () => {
         'features': []
     }
 
+    const imgLocations = [];
     coordinatesArray.forEach(function (coordinate, index) {
         latitude = coordinate[0]
         longitude = coordinate[1]
@@ -453,48 +457,52 @@ map.on('load', async () => {
                 Altitude: coordinate[5],
                 'popup_html': coordinate[3]
             }
-        })
-
-        map.addLayer({
-            id: 'custom_layer' + index,
-            type: 'custom',
-            renderingMode: '3d',
-            onAdd: function (map, mbxContext) {
-                window.tb = new Threebox(map, mbxContext, {
-                    defaultLights: true
-                });
-
-                var options = {
-                    type: 'gltf',
-                    obj: assetUrl + 'kamera.gltf',
-                    units: 'meters',
-                    scale: 0.05,
-                    rotation: {
-                        x: 90,
-                        y: -coordinate[4],
-                        z: 0
-                    },
-                    adjustment: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    },
-                    anchor: 'center',
-                    coords: [coordinate[1], coordinate[0]],
-                    tooltip: true
-                }
-                tb.loadObj(options, function (model) {
-                    model.setCoords(options.coords);
-                    tb.add(model);
-                });
-
-            },
-            render: function (gl, matrix) {
-                tb.update();
-            }
         });
 
-        map.setLayerZoomRange('custom_layer' + index, 19, 30);
+        imgLocations.push({
+            coordinates: [longitude, latitude]
+        })
+
+        // map.addLayer({
+        //     id: 'custom_layer' + index,
+        //     type: 'custom',
+        //     renderingMode: '3d',
+        //     onAdd: function (map, mbxContext) {
+        //         window.tb = new Threebox(map, mbxContext, {
+        //             defaultLights: true
+        //         });
+
+        //         var options = {
+        //             type: 'gltf',
+        //             obj: assetUrl + 'kamera.gltf',
+        //             units: 'meters',
+        //             scale: 0.05,
+        //             rotation: {
+        //                 x: 90,
+        //                 y: -coordinate[4],
+        //                 z: 0
+        //             },
+        //             adjustment: {
+        //                 x: 0,
+        //                 y: 0,
+        //                 z: 0
+        //             },
+        //             anchor: 'center',
+        //             coords: [coordinate[1], coordinate[0]],
+        //             tooltip: true
+        //         }
+        //         tb.loadObj(options, function (model) {
+        //             model.setCoords(options.coords);
+        //             tb.add(model);
+        //         });
+
+        //     },
+        //     render: function (gl, matrix) {
+        //         tb.update();
+        //     }
+        // });
+
+        // map.setLayerZoomRange('custom_layer' + index, 19, 30);
 
         newExifcamera['features'].push({
             type: 'Feature',
@@ -643,6 +651,59 @@ map.on('load', async () => {
         }
     })
 
+    console.log(imgLocations)
+    const ICON_MAPPING = {
+        marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
+    };
+    const deckOverlay = new deck.MapboxOverlay({
+        layers: [
+            new deck.IconLayer({
+            id: 'IconLayer',
+            data: imgLocations,
+            
+            /* props from IconLayer class */
+            
+            // alphaCutoff: 0.05,
+            // billboard: true,
+            // getAngle: 0,
+            getColor: d => [Math.sqrt(d.exits), 140, 0],
+            getIcon: d => 'marker',
+            // getPixelOffset: [0, 0],
+            getPosition: d => d.coordinates,
+            getSize: d => 5,
+            iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+            iconMapping: {
+                marker: {
+                x: 0,
+                y: 0,
+                width: 128,
+                height: 128,
+                anchorY: 128,
+                mask: true
+                }
+            },
+            // onIconError: null,
+            // sizeMaxPixels: Number.MAX_SAFE_INTEGER,
+            // sizeMinPixels: 0,
+            sizeScale: 8,
+            // sizeUnits: 'pixels',
+            // textureParameters: null,
+            
+            /* props inherited from Layer class */
+            
+            // autoHighlight: false,
+            // coordinateOrigin: [0, 0, 0],
+            // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
+            // highlightColor: [0, 0, 128, 128],
+            // modelMatrix: null,
+            // opacity: 1,
+            pickable: true,
+            // visible: true,
+            // wrapLongitude: false,
+            })
+    ]
+    });
+    map.addControl(deckOverlay);
 
     map.loadImage(assetUrl + '/camera.png', (error, image) => {
         if (error) throw error;
