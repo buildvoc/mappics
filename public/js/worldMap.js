@@ -61,6 +61,8 @@ var coordinatesArray = JSON.parse(mapElement.dataset.coordinates);
 var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 
 map.on('load', async () => {
+    
+// Section 1 - Setup different map modes
     $('.mapboxgl-ctrl-top-left').append(`
 <div class="mapboxgl-ctrl mapboxgl-ctrl-group">
 
@@ -150,6 +152,7 @@ map.on('load', async () => {
     map.setLayoutProperty('googlesatellite', 'visibility', 'none');
     map.setLayoutProperty('osmstreet', 'visibility', 'none');
 
+    // Section 2 - Setup 3D buildings
     map.addLayer({
         "id": "OS/TopographicArea_2/Building/1_3D",
         "type": "fill-extrusion",
@@ -261,6 +264,8 @@ map.on('load', async () => {
         }
     });
 
+    // Section 3 - Map editing
+    map.addControl(draw);
     map.on('click', 'OS/TopographicArea_2/Building/1_3D', (e) => {
 
         map.setFilter('OS/TopographicArea_2/Building/1_3D_high', ['in', 'TOID', e.features[0].properties.TOID]);
@@ -368,6 +373,7 @@ map.on('load', async () => {
 
     });
 
+    // Section 4 - Map controls
     map.addControl(new mapboxgl.GeolocateControl({
         positionOptions: {
             enableHighAccuracy: true
@@ -377,10 +383,7 @@ map.on('load', async () => {
     }), 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-
-    map.addControl(draw);
-
-
+    // Section 5 - Images on map
     var pointsdata = {
         'type': 'FeatureCollection',
         'features': []
@@ -430,7 +433,7 @@ map.on('load', async () => {
         'features': []
     }
 
-    const imgLocations = [];
+    const imgInfoArray = [];
     coordinatesArray.forEach(function (coordinate, index) {
         latitude = coordinate[0]
         longitude = coordinate[1]
@@ -459,9 +462,13 @@ map.on('load', async () => {
             }
         });
 
-        imgLocations.push({
-            coordinates: [longitude, latitude]
-        })
+        const imgInfo = {
+            URL: coordinate[2],
+            altitude: coordinate[5],
+            coordinates: [longitude, latitude],
+            bearing: Bearingofcamera 
+        }
+        imgInfoArray.push(imgInfo);
 
         // map.addLayer({
         //     id: 'custom_layer' + index,
@@ -651,123 +658,131 @@ map.on('load', async () => {
         }
     })
 
-    console.log(imgLocations)
-    const ICON_MAPPING = {
-        marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
-    };
-    const deckOverlay = new deck.MapboxOverlay({
-        layers: [
-            new deck.IconLayer({
-            id: 'IconLayer',
-            data: imgLocations,
-            
-            /* props from IconLayer class */
-            
-            // alphaCutoff: 0.05,
-            // billboard: true,
-            // getAngle: 0,
-            getColor: d => [Math.sqrt(d.exits), 140, 0],
-            getIcon: d => 'marker',
-            // getPixelOffset: [0, 0],
-            getPosition: d => d.coordinates,
-            getSize: d => 5,
-            iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-            iconMapping: {
-                marker: {
-                x: 0,
-                y: 0,
-                width: 128,
-                height: 128,
-                anchorY: 128,
-                mask: true
+    console.log(imgInfoArray)
+    const iconLayer = new deck.IconLayer({
+        id: 'IconLayer',
+        data: imgInfoArray,
+        getIcon: (d) => 'marker',
+        getPosition: d => d.coordinates,
+        getColor: (d) => [203, 24, 226],
+        getSize: (d) => 2,
+        getAngle: (d) => - d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
+        iconAtlas: assetUrl + '/camera.png',
+        iconMapping: {
+            marker: {
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 167,
+            // anchorY: 128,
+            mask: true,
+            },
+        },
+        sizeScale: 8,
+        billboard: false,
+        pickable: true,
+        onHover: handleHover,
+        });
+    
+        const deckOverlay = new deck.MapboxOverlay({
+        layers: [iconLayer],
+        });
+    
+        function handleHover(info) {
+            const { x, y, object } = info;
+            const tooltipElement = document.getElementById('custom-tooltip');
+            map.getCanvas().style.cursor = 'pointer';
+            if (object) {
+    
+                const tooltipContent = `
+                <img src="/galleries/${object.URL}" alt="Click to view full image">
+                <br>
+                <b>Altitude:</b> ${object.altitude.toFixed(2)}m
+                <br>
+                <b>Heading:</b> ${object.bearing.toFixed(2)}°
+                `;
+                coordinates = info.coordinate;
+                while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
+                    coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
                 }
-            },
-            // onIconError: null,
-            // sizeMaxPixels: Number.MAX_SAFE_INTEGER,
-            // sizeMinPixels: 0,
-            sizeScale: 8,
-            // sizeUnits: 'pixels',
-            // textureParameters: null,
-            
-            /* props inherited from Layer class */
-            
-            // autoHighlight: false,
-            // coordinateOrigin: [0, 0, 0],
-            // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
-            // highlightColor: [0, 0, 128, 128],
-            // modelMatrix: null,
-            // opacity: 1,
-            pickable: true,
-            // visible: true,
-            // wrapLongitude: false,
-            })
-    ]
-    });
-    map.addControl(deckOverlay);
-
-    map.loadImage(assetUrl + '/camera.png', (error, image) => {
-        if (error) throw error;
-        map.addImage('camera-icon', image, {
-            'sdf': true
-        });
-        map.addSource('newExifcamera', {
-            'type': 'geojson',
-            'data': newExifcamera,
-            'generateId': true
-        });
-        map.addLayer({
-            'id': 'newExifcamera',
-            'source': 'newExifcamera',
-            'type': 'symbol',
-            'layout': {
-                'icon-image': 'camera-icon',
-                'icon-size': 0.1,
-                'icon-rotate': ['get', 'Bearing'],
-                'icon-pitch-alignment': 'map',
-                'icon-rotation-alignment': 'map',
-                'icon-allow-overlap': true
-            },
-            'paint': {
-                'icon-color': '#cb18e2'
-            },
-            'maxzoom': 19
-        });
-
-        let newExifcameraCallback1 = (e) => {
-            map.getCanvas().style.cursor = 'pointer';
-            coordinates = e.features[0].geometry.coordinates.slice();
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                
+                console.log(tooltipElement)
+                tooltipElement.innerHTML = tooltipContent;
+                tooltipElement.style.display = 'block';
+                tooltipElement.style.left = x + 'px';
+                tooltipElement.style.top = y + 'px';
+                tooltipElement.style.zIndex = 999;
+                
+            } else {
+                map.getCanvas().style.cursor = '';
+                tooltipElement.style.display = 'none';
             }
-            whattoshow = `
-<img src="/galleries/${e.features[0].properties.URL}" alt="Click to view full image" width="240" height="240"><br>
-<b>Altitude:</b> ${(e.features[0].properties.Altitude).toFixed(2)}m<br>
-<b>Heading:</b> ${(e.features[0].properties.Bearing).toFixed(2)}°<br>
-`;
-            popup.setLngLat(coordinates).setHTML(whattoshow).addTo(map);
-        };
-        map.on('mouseenter', 'newExifcamera', newExifcameraCallback1);
-        // map.on('touchstart', 'newExifcamera', newExifcameraCallback1);
+        }
+        map.addControl(deckOverlay);
 
-        let newExifcameraCallback2 = () => {
-            map.getCanvas().style.cursor = '';
-            popup.remove();
-        };
-        map.on('mouseleave', 'newExifcamera', newExifcameraCallback2);
-        // map.on('touchend', 'newExifcamera', newExifcameraCallback2);
+//     map.loadImage(assetUrl + '/camera.png', (error, image) => {
+//         if (error) throw error;
+//         map.addImage('camera-icon', image, {
+//             'sdf': true
+//         });
+//         map.addSource('newExifcamera', {
+//             'type': 'geojson',
+//             'data': newExifcamera,
+//             'generateId': true
+//         });
+//         map.addLayer({
+//             'id': 'newExifcamera',
+//             'source': 'newExifcamera',
+//             'type': 'symbol',
+//             'layout': {
+//                 'icon-image': 'camera-icon',
+//                 'icon-size': 0.1,
+//                 'icon-rotate': ['get', 'Bearing'],
+//                 'icon-pitch-alignment': 'map',
+//                 'icon-rotation-alignment': 'map',
+//                 'icon-allow-overlap': true
+//             },
+//             'paint': {
+//                 'icon-color': '#cb18e2'
+//             },
+//             'maxzoom': 19
+//         });
 
-        map.on('click', 'newExifcamera', (e) => {
-            map.getCanvas().style.cursor = 'pointer';
-            coordinates = e.features[0].geometry.coordinates.slice();
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
+//         let newExifcameraCallback1 = (e) => {
+//             map.getCanvas().style.cursor = 'pointer';
+//             coordinates = e.features[0].geometry.coordinates.slice();
+//             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+//                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+//             }
+//             whattoshow = `
+// <img src="/galleries/${e.features[0].properties.URL}" alt="Click to view full image" width="240" height="240"><br>
+// <b>Altitude:</b> ${(e.features[0].properties.Altitude).toFixed(2)}m<br>
+// <b>Heading:</b> ${(e.features[0].properties.Bearing).toFixed(2)}°<br>
+// `;
+//             popup.setLngLat(coordinates).setHTML(whattoshow).addTo(map);
+//         };
+//         map.on('mouseenter', 'newExifcamera', newExifcameraCallback1);
+//         // map.on('touchstart', 'newExifcamera', newExifcameraCallback1);
 
-            popupMappics.setLngLat(coordinates).setHTML(e.features[0].properties.popup_html).addTo(map);
-        });
+//         let newExifcameraCallback2 = () => {
+//             map.getCanvas().style.cursor = '';
+//             popup.remove();
+//         };
+//         map.on('mouseleave', 'newExifcamera', newExifcameraCallback2);
+//         // map.on('touchend', 'newExifcamera', newExifcameraCallback2);
+
+//         map.on('click', 'newExifcamera', (e) => {    
+//             map.getCanvas().style.cursor = 'pointer';
+//             coordinates = e.features[0].geometry.coordinates.slice();
+//             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+//                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+//             }
+
+//             popupMappics.setLngLat(coordinates).setHTML(e.features[0].properties.popup_html).addTo(map);
+//         });
 
 
-    });
+//     });
 
     map.addSource('fieldview', {
         'type': 'geojson',
@@ -803,7 +818,7 @@ map.on('load', async () => {
         'type': 'fill-extrusion',
         'source': 'fieldofview3D',
         'paint': {
-            'fill-extrusion-color': "#48C6EF",
+            'fill-extrusion-color': "#CB1AE2",
             'fill-extrusion-height': ['get', 'base'],
             'fill-extrusion-base': ['get', 'height'],
             'fill-extrusion-opacity': 0.6
@@ -814,7 +829,7 @@ map.on('load', async () => {
         'type': 'fill-extrusion',
         'source': 'fieldofview3Dcontent',
         'paint': {
-            'fill-extrusion-color': "#48C6EF",
+            'fill-extrusion-color': "#CB1AE2",
             'fill-extrusion-height': ['get', 'base'],
             'fill-extrusion-base': ['get', 'height'],
             'fill-extrusion-opacity': 0.05
@@ -880,6 +895,7 @@ map.on('load', async () => {
         }
     });
 
+    // Section 6
     map.loadImage(assetUrl + 'triangle.png', (error, image) => {
         if (error) throw error;
         map.addImage('triangle-icon', image, {
