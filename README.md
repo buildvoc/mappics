@@ -78,7 +78,8 @@ XAMPP is being used for development purposes
 7. Run this command php -S localhost:8000 -t public/ to start server from root directory.
 8. run http://localhost/phpmyadmin
 9. Add a session, then under that session ran the script on test db. and this is how it looks, the columns are added.
-10. place your images in the `<root>/var/galleries` directory (Mappics supports `jpg` and `png` images), organized in folders (they will become galleries)
+10. Place your images in the `<root>/var/galleries` directory (Mappics supports `jpg` and `png` images), organized in folders (they will become galleries).
+11. Place your geojson file in `<root>/var/galleries` directory.
 11. run the console command `bin/console mappics:process-galleries` from the `<root>` directory
 12. go to the home page and enjoy your photos!
 
