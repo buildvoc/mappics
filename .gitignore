@@ -13,3 +13,4 @@ deploy.php
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+vendor/*
