@@ -659,7 +659,7 @@ map.on('load', async () => {
     })
 
     console.log(imgInfoArray)
-    const iconLayer = new deck.IconLayer({
+    const exifCameraLayer = new deck.IconLayer({
         id: 'IconLayer',
         data: imgInfoArray,
         getIcon: (d) => 'marker',
@@ -684,9 +684,31 @@ map.on('load', async () => {
         onHover: handleHover,
         });
     
-        const deckOverlay = new deck.MapboxOverlay({
-        layers: [iconLayer],
+        const exifCameraDeckOverlay = new deck.MapboxOverlay({
+            layers: [exifCameraLayer],
         });
+
+        const deckglMrkerLayer = new deck.IconLayer({
+            id: 'IconLayer',
+            data: imgInfoArray,
+            getIcon: (d) => 'marker',
+            iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+            iconMapping: {
+                marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
+            },
+            getPosition: d => d.coordinates,
+            getColor: d => [Math.sqrt(d.exits), 140, 0],
+            getSize: d => 5,
+            // getAngle: (d) => - d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
+            sizeScale: 8,
+            billboard: true,
+            pickable: true,
+            onHover: handleHover,
+            });
+        
+            const markerLayerdeckOverlay = new deck.MapboxOverlay({
+                layers: [deckglMrkerLayer],
+            });
     
         function handleHover(info) {
             const { x, y, object } = info;
@@ -718,7 +740,8 @@ map.on('load', async () => {
                 tooltipElement.style.display = 'none';
             }
         }
-        map.addControl(deckOverlay);
+        map.addControl(exifCameraDeckOverlay);
+        map.addControl(markerLayerdeckOverlay);
 
 //     map.loadImage(assetUrl + '/camera.png', (error, image) => {
 //         if (error) throw error;
