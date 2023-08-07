@@ -29,6 +29,11 @@
         <script src="https://unpkg.com/leaflet-geotag-photo/dist/Leaflet.GeotagPhoto.min.js"></script>
 
         <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+        <script src="js/MapControls.js"></script>
+        <script src="js/MapLayers.js"></script>
+        <script src="js/MapHandler.js"></script>
+        <script src="js/MapModes.js"></script>
+        <script src="js/GeoJSONHandler.js"></script>
 
         {# <link href="https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.1/dist/threebox.css" rel="stylesheet" /> #}
 
@@ -410,7 +415,18 @@
                 height: max-content;
                 width: max-content;
                 pointer-events: none;
-                background: rgba(0, 0, 0, 0.8);
+                background: rgba(255, 255, 255, 1);
+                color: #fff;
+                padding: 5px;
+                border-radius: 5px;
+                display: none;
+            }
+
+            .custom-card {
+                position: absolute;
+                height: max-content;
+                width: max-content;
+                background: rgba(255, 255, 255, 1);
                 color: #fff;
                 padding: 5px;
                 border-radius: 5px;

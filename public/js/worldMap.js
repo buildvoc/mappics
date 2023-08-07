@@ -62,326 +62,21 @@ var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 
 map.on('load', async () => {
     
-// Section 1 - Setup different map modes
-    $('.mapboxgl-ctrl-top-left').append(`
-<div class="mapboxgl-ctrl mapboxgl-ctrl-group">
-
-<div class="dropdown">
-  <button class="dropbtn" style="width: 60px; font-size: 12px;background-color: #337795;">Base Map</button>
-  <div class="dropdown-content">
-  <div id="menu" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;">
-
-<div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
-<input id="os" type="radio" name="rtoggle" value="os" checked="checked" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'none'); map.setLayoutProperty('googlesatellite', 'visibility', 'none'); map.setLayoutProperty('osmstreet', 'visibility', 'none');">
-<label for="os">Ordnance Survey</label>
-</div>
-
-<div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
-<input id="osmstreet" type="radio" name="rtoggle" value="osmstreet" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'none'); map.setLayoutProperty('googlesatellite', 'visibility', 'none'); map.setLayoutProperty('osmstreet', 'visibility', 'visible');">
-<label for="osmstreet">OpenStreetMap Street</label>
-</div>
-
-<div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
-<input id="satellite" type="radio" name="rtoggle" value="satellite" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'none'); map.setLayoutProperty('googlesatellite', 'visibility', 'visible'); map.setLayoutProperty('osmstreet', 'visibility', 'none');">
-<label for="satellite">Google Satellite</label>
-</div>
-
-<div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
-<input id="hybrid" type="radio" name="rtoggle" value="hybrid" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'visible'); map.setLayoutProperty('googlesatellite', 'visibility', 'none'); map.setLayoutProperty('osmstreet', 'visibility', 'none');">
-<label for="hybrid">Google Hybrid</label>
-</div>
-
-</div>
-  </div>
-</div>
-
-
-</div>
-`);
-
-    map.setFog({
-        'color': 'rgb(255, 255, 255)',
-        'high-color': 'rgb(55, 187, 232)',
-        'horizon-blend': 0.2
-    });
-
-    map.addLayer({
-        'id': 'googlehybrid',
-        'type': 'raster',
-        'source': {
-            'type': 'raster',
-            'tiles': [
-                'https://mt1.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}'
-            ],
-            'tileSize': 128,
-            'layout': {
-                'visibility': 'none'
-            }
-        }
-    });
-    map.addLayer({
-        'id': 'googlesatellite',
-        'type': 'raster',
-        'source': {
-            'type': 'raster',
-            'tiles': [
-                'https://mt1.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}'
-            ],
-            'tileSize': 128,
-            'layout': {
-                'visibility': 'none'
-            }
-        }
-    });
-    map.addLayer({
-        'id': 'osmstreet',
-        'type': 'raster',
-        'source': {
-            'type': 'raster',
-            'tiles': [
-                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            ],
-            'tileSize': 128,
-            'layout': {
-                'visibility': 'none'
-            }
-        }
-    });
-
-    map.setLayoutProperty('googlehybrid', 'visibility', 'none');
-    map.setLayoutProperty('googlesatellite', 'visibility', 'none');
-    map.setLayoutProperty('osmstreet', 'visibility', 'none');
+    // Section 1 - Setup different map modes
+    const mapModes = new MapModes(map);
+    mapModes.addBaseMapControl();
+    mapModes.setFog();
+    mapModes.addBaseMapLayers();
 
     // Section 2 - Setup 3D buildings
-    map.addLayer({
-        "id": "OS/TopographicArea_2/Building/1_3D",
-        "type": "fill-extrusion",
-        "source": "esri",
-        "source-layer": "TopographicArea_2",
-        "filter": ["==", "_symbol", 4],
-        "minzoom": 15,
-        "layout": {
-            "visibility": "visible"
-        },
-        "paint": {
-            "fill-extrusion-color": "#DCD7C6",
-            "fill-extrusion-height": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "RelHMax"]
-            ],
-            "fill-extrusion-opacity": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                16,
-                0.9
-            ]
-        },
-        'filter': ["all", ["!=", "TOID", "test"]]
-    });
-    map.addLayer({
-        "id": "OS/TopographicArea_2/Building/1_3D_high",
-        "type": "fill-extrusion",
-        "source": "esri",
-        "source-layer": "TopographicArea_2",
-        "filter": ["==", "_symbol", 4],
-        "minzoom": 15,
-        "layout": {
-            "visibility": "visible"
-        },
-        "paint": {
-            "fill-extrusion-color": "#993a3a",
-            "fill-extrusion-height": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "RelHMax"]
-            ],
-            "fill-extrusion-opacity": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                16,
-                0.9
-            ]
-        },
-        'filter': ['in', 'TOID', '']
-    });
-
-    var filterbuildings = ["all", ["!=", "TOID", "test"]];
-
-    for (var i = 0; i < (parsed3dbuildings.features).length; i++) {
-        filterbuildings.push(["!=", "TOID", parsed3dbuildings.features[i].properties.TOID]);
-        parsed3dbuildings.features[i].properties.RelHMax = parseFloat(parsed3dbuildings.features[i].properties.RelHMax);
-    }
-
-    map.setFilter('OS/TopographicArea_2/Building/1_3D', filterbuildings);
-
-    map.addSource('new3Dbuildings', {
-        type: 'geojson',
-        data: parsed3dbuildings
-    });
-    map.addLayer({
-        "id": "new3Dbuildings",
-        "type": "fill-extrusion",
-        "source": "new3Dbuildings",
-        "minzoom": 15,
-        "layout": {
-            "visibility": "visible"
-        },
-        "paint": {
-            "fill-extrusion-color": "#3ec4b9",
-            "fill-extrusion-height": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "RelHMax"]
-            ],
-            "fill-extrusion-opacity": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                16,
-                0.9
-            ]
-        }
-    });
+    const mapLayers = new MapLayers(map, parsed3dbuildings);
+    mapLayers.addLayers();
 
     // Section 3 - Map editing
-    map.addControl(draw);
-    map.on('click', 'OS/TopographicArea_2/Building/1_3D', (e) => {
-
-        map.setFilter('OS/TopographicArea_2/Building/1_3D_high', ['in', 'TOID', e.features[0].properties.TOID]);
-        draw.deleteAll();
-        map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D', 'visibility', 'none');
-        map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D_high', 'visibility', 'none');
-        draw.add(e.features[0]);
-
-
-        $('#insideinfo').css('display', 'block');
-
-        $('#discardbutton').click(function () {
-            $('#insideinfo').css('display', 'none');
-            draw.deleteAll();
-            map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D', 'visibility', 'visible');
-            map.setFilter('OS/TopographicArea_2/Building/1_3D_high', ['in', 'TOID', '']);
-            map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D_high', 'visibility', 'visible');
-        });
-
-        $('#savebutton').click(async function () {
-            $('#insideinfo').css('display', 'none');
-            (parsed3dbuildings.features).push(draw.getAll().features[0]);
-
-            const feature = draw.getAll();
-
-            // $.post('/3DBuildings_edited/edit.php', {
-            // 	data: parsed3dbuildings
-            // });
-
-            map.getSource('new3Dbuildings').setData(parsed3dbuildings);
-            filterbuildings.push(["!=", "TOID", draw.getAll().features[0].properties.TOID]);
-            map.setFilter('OS/TopographicArea_2/Building/1_3D', filterbuildings);
-            map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D', 'visibility', 'visible');
-            map.setFilter('OS/TopographicArea_2/Building/1_3D_high', ['in', 'TOID', '']);
-            map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D_high', 'visibility', 'visible');
-            draw.deleteAll();
-
-            console.log("-------");
-            console.log(feature)
-            try {ss
-                const myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                const raw = JSON.stringify({
-                    "osid": feature.features[0].id,
-                    "toid": feature.features[0].properties.TOID,
-                    "symbol": feature.features[0].properties._symbol,
-                    "height_max": feature.features[0].properties.RelHMax,
-                    "geom": feature.features[0].geometry
-                });
-                const requestOptions = {
-                    method: 'POST',
-                    headers: myHeaders,
-                    body: raw,
-                };
-                const response = fetch('https://buildingshistory.co.uk/api/v1/geo', requestOptions)
-                const data = response.json();
-                console.log(data);
-            } catch (error) {
-                console.log(error);
-            }
-        });
-
-        $('#uploadbutton').click(async function () {
-            $('#insideinfo').css('display', 'none');
-            (parsed3dbuildings.features).push(draw.getAll().features[0]);
-
-            const feature = draw.getAll();
-
-            // $.post('./3DBuildings_edited/edit.php', {
-            // 	data: parsed3dbuildings
-            // });
-
-            map.getSource('new3Dbuildings').setData(parsed3dbuildings);
-            filterbuildings.push(["!=", "TOID", draw.getAll().features[0].properties.TOID]);
-            map.setFilter('OS/TopographicArea_2/Building/1_3D', filterbuildings);
-            map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D', 'visibility', 'visible');
-            map.setFilter('OS/TopographicArea_2/Building/1_3D_high', ['in', 'TOID', '']);
-            map.setLayoutProperty('OS/TopographicArea_2/Building/1_3D_high', 'visibility', 'visible');
-            draw.deleteAll();
-
-            console.log("-------");
-            console.log(feature)
-            try {
-                const myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                const raw = JSON.stringify({
-                    "osid": feature.features[0].id,
-                    "toid": feature.features[0].properties.TOID,
-                    "symbol": feature.features[0].properties._symbol,
-                    "height_max": feature.features[0].properties.RelHMax,
-                    "geom": feature.features[0].geometry
-                });
-                const requestOptions = {
-                    method: 'POST',
-                    headers: myHeaders,
-                    body: raw,
-                };
-                const response = fetch('https://buildingshistory.co.uk/api/v1/geo/upload', requestOptions)
-                const data = response.json();
-                console.log(data);
-            } catch (error) {
-                console.log(error);
-            }
-        });
-
-    });
+    const mapHandler = new MapHandler(map, draw);
 
     // Section 4 - Map controls
-    map.addControl(new mapboxgl.GeolocateControl({
-        positionOptions: {
-            enableHighAccuracy: true
-        },
-        trackUserLocation: true,
-        showUserHeading: true
-    }), 'top-right');
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    const mapControls = new MapControls(map);
 
     // Section 5 - Images on map
     var pointsdata = {
@@ -441,7 +136,7 @@ map.on('load', async () => {
         Bearingofcamera = coordinate[4];
         Atitudeofcamera = coordinate[5];
         URLofcamera = coordinate[2];
-
+        clickPop = coordinate[3];
         f = coordinate[9];
         fquiv = (coordinate[9] * 35) / coordinate[8];
 
@@ -466,50 +161,10 @@ map.on('load', async () => {
             URL: coordinate[2],
             altitude: coordinate[5],
             coordinates: [longitude, latitude],
-            bearing: Bearingofcamera 
+            bearing: Bearingofcamera,
+            'popup_html': clickPop
         }
         imgInfoArray.push(imgInfo);
-
-        // map.addLayer({
-        //     id: 'custom_layer' + index,
-        //     type: 'custom',
-        //     renderingMode: '3d',
-        //     onAdd: function (map, mbxContext) {
-        //         window.tb = new Threebox(map, mbxContext, {
-        //             defaultLights: true
-        //         });
-
-        //         var options = {
-        //             type: 'gltf',
-        //             obj: assetUrl + 'kamera.gltf',
-        //             units: 'meters',
-        //             scale: 0.05,
-        //             rotation: {
-        //                 x: 90,
-        //                 y: -coordinate[4],
-        //                 z: 0
-        //             },
-        //             adjustment: {
-        //                 x: 0,
-        //                 y: 0,
-        //                 z: 0
-        //             },
-        //             anchor: 'center',
-        //             coords: [coordinate[1], coordinate[0]],
-        //             tooltip: true
-        //         }
-        //         tb.loadObj(options, function (model) {
-        //             model.setCoords(options.coords);
-        //             tb.add(model);
-        //         });
-
-        //     },
-        //     render: function (gl, matrix) {
-        //         tb.update();
-        //     }
-        // });
-
-        // map.setLayerZoomRange('custom_layer' + index, 19, 30);
 
         newExifcamera['features'].push({
             type: 'Feature',
@@ -682,6 +337,7 @@ map.on('load', async () => {
         billboard: false,
         pickable: true,
         onHover: handleHover,
+        onClick: handleClick,
         });
     
         const exifCameraDeckOverlay = new deck.MapboxOverlay({
@@ -713,6 +369,7 @@ map.on('load', async () => {
         function handleHover(info) {
             const { x, y, object } = info;
             const tooltipElement = document.getElementById('custom-tooltip');
+            const cardElement = document.getElementById('custom-card');
             map.getCanvas().style.cursor = 'pointer';
             if (object) {
     
@@ -733,6 +390,8 @@ map.on('load', async () => {
                 tooltipElement.style.display = 'block';
                 tooltipElement.style.left = x + 'px';
                 tooltipElement.style.top = y + 'px';
+                tooltipElement.style.color = 0x000;
+
                 tooltipElement.style.zIndex = 999;
                 
             } else {
@@ -740,6 +399,34 @@ map.on('load', async () => {
                 tooltipElement.style.display = 'none';
             }
         }
+        
+        function handleClick(info){
+            const { x, y, object } = info;
+            map.getCanvas().style.cursor = 'pointer';
+            const cardElement = document.getElementById('custom-card');
+
+            console.log(object.popup_html)
+
+            if (object) {
+                coordinates = info.coordinate;
+                while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
+                    coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
+                }
+
+                cardElement.innerHTML = object.popup_html;
+                cardElement.style.display = 'block';
+                cardElement.style.left = x + 'px';
+                cardElement.style.top = y + 'px';
+                cardElement.style.color = 0x000;
+
+                cardElement.style.zIndex = 999;
+            } else {
+                map.getCanvas().style.cursor = '';
+                cardElement.style.display = 'none';
+            }
+        }
+
+
         map.addControl(exifCameraDeckOverlay);
         map.addControl(markerLayerdeckOverlay);
 
@@ -879,7 +566,6 @@ map.on('load', async () => {
     map.on('mouseleave', 'fieldofview3Dcontent', fieldofview3DcontentCallback2);
     // map.on('touchend', 'fieldofview3Dcontent', fieldofview3DcontentCallback2);
 
-
     map.addLayer({
         'id': 'polygondata_fill',
         'type': 'fill',
@@ -917,6 +603,9 @@ map.on('load', async () => {
             'line-width': 2
         }
     });
+
+    // const geoJSONHandler = new GeoJSONHandler(geojsoncontents, coordinatesArray, map, turf, deck, assetUrl);
+    // geoJSONHandler.processGeoJSONData();
 
     // Section 6
     map.loadImage(assetUrl + 'triangle.png', (error, image) => {
