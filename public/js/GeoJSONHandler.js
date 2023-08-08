@@ -1,6 +1,6 @@
 class GeoJSONHandler {
 
-  constructor(map, geojsoncontents, coordinatesArray, turf, deck, popup, assetUrl) {
+  constructor(map, geojsoncontents, coordinatesArray, turf, deck, popup, assetUrl, pointsdata, polygondata, linesdata) {
     this.geojsoncontents = geojsoncontents;
     this.coordinatesArray = coordinatesArray;
     this.map = map;
@@ -8,24 +8,11 @@ class GeoJSONHandler {
     this.deck = deck;
     this.popup = popup;
     this.assetUrl = assetUrl;
-
-    // Initialize the feature collections
-    this.pointsdata = {
-      'type': 'FeatureCollection',
-      'features': []
-    };
+    this.pointsdata = pointsdata;
+    this.polygondata = polygondata;
+    this.linesdata = linesdata;
 
     this.fieldview = {
-      'type': 'FeatureCollection',
-      'features': []
-    };
-
-    this.polygondata = {
-      'type': 'FeatureCollection',
-      'features': []
-    };
-
-    this.linesdata = {
       'type': 'FeatureCollection',
       'features': []
     };
@@ -145,19 +132,6 @@ class GeoJSONHandler {
   }
 
   processGeoJSONData() {
-    for (let i = 0; i < this.geojsoncontents.length; i++) {
-      const content = JSON.parse(this.geojsoncontents[i]);
-      for (let o = 0; o < content.features.length; o++) {
-        if (content.features[o].geometry.type === "Point") {
-          this.pointsdata['features'].push(content.features[o]);
-        } else if (content.features[o].geometry.type === "Polygon") {
-          this.polygondata['features'].push(content.features[o]);
-        } else if (content.features[o].geometry.type === "LineString") {
-          this.linesdata['features'].push(content.features[o]);
-        }
-      }
-    }
-
     this.coordinatesArray.forEach((coordinate) => {
       const latitude = coordinate[0];
       const longitude = coordinate[1];
@@ -431,6 +405,13 @@ class GeoJSONHandler {
       const markerLayerdeckOverlay = new this.deck.MapboxOverlay({
           layers: [deckglMrkerLayer],
       });
+
+      this.map.on('click',()=>{
+        const cardElement = document.getElementById('custom-card');
+    
+        if(cardElement.style.display = 'block')
+            cardElement.style.display = 'none';
+      })
       
       this.map.addControl(markerLayerdeckOverlay);
       this.map.addControl(exifCameraDeckOverlay);
@@ -464,52 +445,57 @@ class GeoJSONHandler {
     const { x, y, object } = info;
     const tooltipElement = document.getElementById('custom-tooltip');
     this.map.getCanvas().style.cursor = 'pointer';
+
     if (object) {
-      console.log(info);
-      const tooltipContent = `
+        const tooltipContent = `
         <img src="/galleries/${object.URL}" alt="Click to view full image">
         <br>
         <b>Altitude:</b> ${object.altitude.toFixed(2)}m
         <br>
         <b>Heading:</b> ${object.bearing.toFixed(2)}°
-      `;
-      const coordinates = info.coordinate;
-      while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
-        coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
-      }
-
-      tooltipElement.innerHTML = tooltipContent;
-      tooltipElement.style.display = 'block';
-      tooltipElement.style.left = x + 'px';
-      tooltipElement.style.top = y + 'px';
-      tooltipElement.style.color = 0x000;
-      tooltipElement.style.zIndex = 999;
-    } else {
-      this.map.getCanvas().style.cursor = '';
-      tooltipElement.style.display = 'none';
-    }
-  }
-
-  handleClick(info){
-    const { x, y, object } = info;
-    const cardElement = document.getElementById('custom-card');
-    this.map.getCanvas().style.cursor = 'pointer';
-
-    if (object) {
+        `;
       const coordinates = info.coordinate;
         while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
             coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
         }
-
-        cardElement.innerHTML = object.popup_html;
-        cardElement.style.display = 'block';
-        cardElement.style.left = x + 'px';
-        cardElement.style.top = y + 'px';
-        cardElement.style.color = 0x000;
-        cardElement.style.zIndex = 999;
+        
+        tooltipElement.innerHTML = tooltipContent;
+        tooltipElement.style.display = 'block';
+        tooltipElement.style.left = x + 'px';
+        tooltipElement.style.top = y + 'px';
+        tooltipElement.style.color = 0x000;
+        tooltipElement.style.zIndex = 999;
+        
     } else {
         this.map.getCanvas().style.cursor = '';
-        cardElement.style.display = 'none';
+        tooltipElement.style.display = 'none';
+    }
+  }
+
+  handleClick(info) {
+    const { x, y, object } = info;
+    const mapCanvas = this.map.getCanvas();
+    const cardElement = document.getElementById('custom-card');
+  
+    mapCanvas.style.cursor = 'pointer';
+  
+    const coordinates = info.coordinate;
+    while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
+      coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
+    }
+  
+    cardElement.innerHTML = object.popup_html;
+    cardElement.style.color = '#000';
+    cardElement.style.fontSize = '12px';
+    cardElement.style.zIndex = 999;
+  
+    if (cardElement.style.display === 'none') {
+      cardElement.style.display = 'block';
+      cardElement.style.left = x + 'px';
+      cardElement.style.top = y + 'px';
+      
+    } else {
+      cardElement.style.display = 'none';
     }
   }
 }
