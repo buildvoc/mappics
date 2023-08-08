@@ -681,6 +681,8 @@ map.on('load', async () => {
         },
         sizeScale: 8,
         billboard: false,
+        closeButton: true,
+        closeOnClick: true,
         pickable: true,
         onHover: handleHover,
         onClick: handleClick,
@@ -731,7 +733,6 @@ map.on('load', async () => {
                     coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
                 }
                 
-                console.log(tooltipElement)
                 tooltipElement.innerHTML = tooltipContent;
                 tooltipElement.style.display = 'block';
                 tooltipElement.style.left = x + 'px';
@@ -745,30 +746,40 @@ map.on('load', async () => {
             }
         }
 
-        function handleClick(info){
+        function handleClick(info) {
             const { x, y, object } = info;
-            map.getCanvas().style.cursor = 'pointer';
+            const mapCanvas = map.getCanvas();
+            const cardElement = document.getElementById('custom-card');
+          
+            mapCanvas.style.cursor = 'pointer';
+          
+            coordinates = info.coordinate;
+            while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
+              coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
+            }
+          
+            cardElement.innerHTML = object.popup_html;
+            cardElement.style.color = '#000';
+            cardElement.style.fontSize = '12px';
+            cardElement.style.zIndex = 999;
+          
+            if (cardElement.style.display === 'none') {
+              cardElement.style.display = 'block';
+              cardElement.style.left = x + 'px';
+              cardElement.style.top = y + 'px';
+              
+            } else {
+              cardElement.style.display = 'none';
+            }
+          }
+          
+        map.on('click',()=>{
             const cardElement = document.getElementById('custom-card');
 
-            if (object) {
-                coordinates = info.coordinate;
-                while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
-                    coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
-                }
-
-                cardElement.innerHTML = object.popup_html;
-                cardElement.style.display = 'block';
-                cardElement.style.left = x + 'px';
-                cardElement.style.top = y + 'px';
-                cardElement.style.color = 0x000;
-
-                cardElement.style.zIndex = 999;
-            } else {
-                map.getCanvas().style.cursor = '';
+            if(cardElement.style.display = 'block')
                 cardElement.style.display = 'none';
-            }
-    }
-            
+        })
+  
         map.addControl(exifCameraDeckOverlay);
         map.addControl(markerLayerdeckOverlay);
 
