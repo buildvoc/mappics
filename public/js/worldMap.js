@@ -466,7 +466,8 @@ map.on('load', async () => {
             URL: coordinate[2],
             altitude: coordinate[5],
             coordinates: [longitude, latitude],
-            bearing: Bearingofcamera 
+            bearing: Bearingofcamera,
+            'popup_html': coordinate[3]
         }
         imgInfoArray.push(imgInfo);
 
@@ -682,6 +683,7 @@ map.on('load', async () => {
         billboard: false,
         pickable: true,
         onHover: handleHover,
+        onClick: handleClick,
         });
     
         const exifCameraDeckOverlay = new deck.MapboxOverlay({
@@ -704,6 +706,7 @@ map.on('load', async () => {
             billboard: true,
             pickable: true,
             onHover: handleHover,
+            onClick: handleClick,
             });
         
             const markerLayerdeckOverlay = new deck.MapboxOverlay({
@@ -733,6 +736,7 @@ map.on('load', async () => {
                 tooltipElement.style.display = 'block';
                 tooltipElement.style.left = x + 'px';
                 tooltipElement.style.top = y + 'px';
+                tooltipElement.style.color = 0x000;
                 tooltipElement.style.zIndex = 999;
                 
             } else {
@@ -740,6 +744,31 @@ map.on('load', async () => {
                 tooltipElement.style.display = 'none';
             }
         }
+
+        function handleClick(info){
+            const { x, y, object } = info;
+            map.getCanvas().style.cursor = 'pointer';
+            const cardElement = document.getElementById('custom-card');
+
+            if (object) {
+                coordinates = info.coordinate;
+                while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
+                    coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
+                }
+
+                cardElement.innerHTML = object.popup_html;
+                cardElement.style.display = 'block';
+                cardElement.style.left = x + 'px';
+                cardElement.style.top = y + 'px';
+                cardElement.style.color = 0x000;
+
+                cardElement.style.zIndex = 999;
+            } else {
+                map.getCanvas().style.cursor = '';
+                cardElement.style.display = 'none';
+            }
+    }
+            
         map.addControl(exifCameraDeckOverlay);
         map.addControl(markerLayerdeckOverlay);
 

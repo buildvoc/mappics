@@ -5,6 +5,7 @@
 {% block body %}
     <div id="map" data-coordinates="{{ dataArray|json_encode }}" data-mapboxapikey="{{ mapboxApiKey }}" data-buildings="{{ buildings }}" data-filescontentarray="{{ filescontentarray }}" data-imgcontentarray="{{ imgcontentarray }}" data-assetUrl="{{ asset('images/') }}"></div>
     <div class="custom-tooltip" id="custom-tooltip"></div>
+    <div class="custom-card" id="custom-card"></div>
     <div class="modal fade" id="imageModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content"></div>
