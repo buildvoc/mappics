@@ -1,14 +1,13 @@
 class GeoJSONHandler {
-  constructor(map, geojsoncontents, coordinatesArray, turf, deck, assetUrl) {
+
+  constructor(map, geojsoncontents, coordinatesArray, turf, deck, popup, assetUrl) {
     this.geojsoncontents = geojsoncontents;
     this.coordinatesArray = coordinatesArray;
     this.map = map;
     this.turf = turf;
     this.deck = deck;
+    this.popup = popup;
     this.assetUrl = assetUrl;
-
-    this.addGeoJSONSourcesAndLayers();
-    this.addEventListeners();
 
     // Initialize the feature collections
     this.pointsdata = {
@@ -47,6 +46,8 @@ class GeoJSONHandler {
     };
 
     this.imgInfoArray = [];
+
+    this.addGeoJSONSourcesAndLayers();
   }
 
   addGeoJSONSourcesAndLayers() {
@@ -186,7 +187,8 @@ class GeoJSONHandler {
         URL: coordinate[2],
         altitude: coordinate[5],
         coordinates: [longitude, latitude],
-        bearing: Bearingofcamera 
+        bearing: Bearingofcamera ,
+        'popup_html': coordinate[3]
       };
       this.imgInfoArray.push(imgInfo);
 
@@ -374,10 +376,9 @@ class GeoJSONHandler {
 
   addExifCameraLayer() {
     const imgInfoArray = this.imgInfoArray;
-    const deck = this.deck;
 
     // Create the exifCameraLayer
-    const exifCameraLayer = new deck.IconLayer({
+    const exifCameraLayer = new this.deck.IconLayer({
       id: 'exif-camera-layer',
       data: imgInfoArray,
       getIcon: (d) => 'marker',
@@ -398,14 +399,16 @@ class GeoJSONHandler {
       sizeScale: 8,
       billboard: false,
       pickable: true,
-      onHover: this.handleHover,
+      onHover: this.handleHover.bind(this),
+      onClick: this.handleClick.bind(this),
+
     });
 
     const exifCameraDeckOverlay = new this.deck.MapboxOverlay({
       layers: [exifCameraLayer],
     });
 
-    const deckglMrkerLayer = new deck.IconLayer({
+    const deckglMrkerLayer = new this.deck.IconLayer({
       id: 'IconLayer',
       data: imgInfoArray,
       getIcon: (d) => 'marker',
@@ -420,36 +423,41 @@ class GeoJSONHandler {
       sizeScale: 8,
       billboard: true,
       pickable: true,
-      onHover: handleHover,
+      onHover: this.handleHover.bind(this),
+      onClick: this.handleClick.bind(this),
+
       });
   
-      const markerLayerdeckOverlay = new deck.MapboxOverlay({
+      const markerLayerdeckOverlay = new this.deck.MapboxOverlay({
           layers: [deckglMrkerLayer],
       });
       
       this.map.addControl(markerLayerdeckOverlay);
       this.map.addControl(exifCameraDeckOverlay);
-    }
+  }
 
   addFieldViewLayer() {
-    const fieldview = this.fieldview;
-    const map = this.map;
+    const fieldofview3DcontentCallback1 = (e) => {
+    this.map.getCanvas().style.cursor = 'pointer';
 
-    // Create the fieldViewLayer
-    const fieldViewLayer = new mapboxgl.Layer({
-      id: 'field-view-layer',
-      type: 'line',
-      source: {
-        type: 'geojson',
-        data: fieldview,
-      },
-      paint: {
-        'line-color': '#00FF00',
-        'line-width': 2,
-      },
-    });
+      const whattoshow = `
+        <img src="${e.features[0].properties.URL}" alt="Click to view full image" width="240" height="240"><br>
+        <b>Altitude:</b> ${(e.features[0].properties.Altitude).toFixed(2)}m<br>
+        <b>Heading:</b> ${(e.features[0].properties.Bearing).toFixed(2)}°<br>
+      `;
 
-    this.map.addLayer(fieldViewLayer);
+      this.popup.setLngLat(e.lngLat).setHTML(whattoshow).addTo(this.map);
+    };
+
+    // Field of view popup callback when mouse leaves a feature
+    const fieldofview3DcontentCallback2 = () => {
+      this.map.getCanvas().style.cursor = '';
+      this.popup.remove();
+    };
+
+    // Add event listeners for mouseenter and mouseleave
+    this.map.on('mouseenter', 'fieldofview3Dcontent', fieldofview3DcontentCallback1);
+    this.map.on('mouseleave', 'fieldofview3Dcontent', fieldofview3DcontentCallback2);
   }
 
   handleHover(info) {
@@ -457,6 +465,7 @@ class GeoJSONHandler {
     const tooltipElement = document.getElementById('custom-tooltip');
     this.map.getCanvas().style.cursor = 'pointer';
     if (object) {
+      console.log(info);
       const tooltipContent = `
         <img src="/galleries/${object.URL}" alt="Click to view full image">
         <br>
@@ -473,10 +482,34 @@ class GeoJSONHandler {
       tooltipElement.style.display = 'block';
       tooltipElement.style.left = x + 'px';
       tooltipElement.style.top = y + 'px';
+      tooltipElement.style.color = 0x000;
       tooltipElement.style.zIndex = 999;
     } else {
       this.map.getCanvas().style.cursor = '';
       tooltipElement.style.display = 'none';
+    }
+  }
+
+  handleClick(info){
+    const { x, y, object } = info;
+    const cardElement = document.getElementById('custom-card');
+    this.map.getCanvas().style.cursor = 'pointer';
+
+    if (object) {
+      const coordinates = info.coordinate;
+        while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
+            coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
+        }
+
+        cardElement.innerHTML = object.popup_html;
+        cardElement.style.display = 'block';
+        cardElement.style.left = x + 'px';
+        cardElement.style.top = y + 'px';
+        cardElement.style.color = 0x000;
+        cardElement.style.zIndex = 999;
+    } else {
+        this.map.getCanvas().style.cursor = '';
+        cardElement.style.display = 'none';
     }
   }
 }
