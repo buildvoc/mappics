@@ -6,10 +6,6 @@ var parsed3dbuildings = JSON.parse(mapElement.dataset.buildings);
 $('.info').css('top', '0');
 $('.info').css('left', '30%');
 
-var draw = new MapboxDraw({
-    displayControlsDefault: false
-});
-
 mapboxgl.accessToken = 'pk.eyJ1Ijoibm91ZmVsZ2hheWF0aSIsImEiOiJja3lmNWwwemEwOXNuMnhxcm9qNDF2ZXRhIn0.n0EDO6c611aAGh4r9-FwSg';
 var map = new mapboxgl.Map({
     container: 'map',
@@ -37,12 +33,7 @@ localStorage.getItem('name');
 
 sessionStorage.setItem('map', 'maptiler');
 
-const popup = new mapboxgl.Popup({
-    closeButton: false,
-    closeOnClick: false,
-    maxWidth: '500px'
-});
-
+// use of popup1 base.html.twig
 const popup1 = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: true,
@@ -55,12 +46,11 @@ const popupMappics = new mapboxgl.Popup({
     maxWidth: '500px'
 });
 
-
 var assetUrl = mapElement.dataset.asseturl;
 var coordinatesArray = JSON.parse(mapElement.dataset.coordinates);
 var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 
 map.on('load', () => {
-    const mapControllers = new MapControllers(map, parsed3dbuildings, draw, geojsoncontents, coordinatesArray, turf, deck, popup, assetUrl);
-    mapControllers.initialize();
+    const mapController = new MapController(map, parsed3dbuildings, geojsoncontents, coordinatesArray, assetUrl);
+    mapController.initialize();
 });

@@ -1,7 +1,9 @@
-class MapHandler {
-    constructor(map, draw) {
+class MapEditor {
+    constructor(map) {
       this.map = map;
-      this.draw = draw;
+      this.draw = new MapboxDraw({
+        displayControlsDefault: false
+    });;
   
       this.map.addControl(this.draw);
   

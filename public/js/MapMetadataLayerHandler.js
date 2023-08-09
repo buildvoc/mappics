@@ -1,13 +1,17 @@
-class MapImageLayer {
+class MapMetadataLayerHandler {
     constructor(map, assetUrl, popup, pointsdata) {
       this.map = map;
       this.assetUrl = assetUrl;
-      this.popup = popup;
+      this.popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        maxWidth: '500px'
+      });;
       this.pointsdata = pointsdata;
   
       this.initialize();
     }
-  
+
     initialize() {
       this.loadImage();
     }
@@ -19,11 +23,8 @@ class MapImageLayer {
           'sdf': true
         });
 
-        console.log(this.pointsdata);
         this.addLayer();
         this.setupEventHandlers();
-
-
       });
     }
   

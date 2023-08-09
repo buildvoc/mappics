@@ -1,16 +1,14 @@
-class GeoJSONHandler {
-
-  constructor(map, geojsoncontents, coordinatesArray, turf, deck, popup, assetUrl, pointsdata, polygondata, linesdata) {
-    this.geojsoncontents = geojsoncontents;
-    this.coordinatesArray = coordinatesArray;
+class MapGalleryLayer {
+  constructor(map, cameraMetadata, assetUrl) {
+    this.cameraMetadata = cameraMetadata;
     this.map = map;
-    this.turf = turf;
-    this.deck = deck;
-    this.popup = popup;
+
+    this.popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        maxWidth: '500px'
+    });;
     this.assetUrl = assetUrl;
-    this.pointsdata = pointsdata;
-    this.polygondata = polygondata;
-    this.linesdata = linesdata;
 
     this.fieldview = {
       'type': 'FeatureCollection',
@@ -32,12 +30,12 @@ class GeoJSONHandler {
       'features': []
     };
 
-    this.imgInfoArray = [];
+    this.deckGLData = [];
 
-    this.addGeoJSONSourcesAndLayers();
+    this.addLayers();
   }
 
-  addGeoJSONSourcesAndLayers() {
+  addLayers() {
     this.map.addSource('fieldview', {
       type: 'geojson',
       data: this.fieldview,
@@ -53,18 +51,6 @@ class GeoJSONHandler {
     this.map.addSource('fieldofview3Dcontent', {
       type: 'geojson',
       data: this.fieldofview3Dcontent,
-      generateId: true
-    });
-
-    this.map.addSource('polygondata', {
-      type: 'geojson',
-      data: this.polygondata,
-      generateId: true
-    });
-
-    this.map.addSource('linesdata', {
-      type: 'geojson',
-      data: this.linesdata,
       generateId: true
     });
 
@@ -91,48 +77,10 @@ class GeoJSONHandler {
         'fill-extrusion-opacity': 0.05
       }
     });
-
-    this.map.addLayer({
-      id: 'polygondata_fill',
-      type: 'fill',
-      source: 'polygondata',
-      paint: {
-        'fill-color': '#ffffff',
-        'fill-opacity': 0.1
-      },
-      layout: {
-        visibility: 'visible'
-      }
-    });
-
-    this.map.addLayer({
-      id: 'polygondata_outline',
-      type: 'line',
-      source: 'polygondata',
-      layout: {},
-      paint: {
-        'line-color': '#fff',
-        'line-width': 1
-      }
-    });
-
-    this.map.addLayer({
-      id: 'linesdata',
-      type: 'line',
-      source: 'linesdata',
-      layout: {
-        'line-join': 'round',
-        'line-cap': 'round'
-      },
-      paint: {
-        'line-color': '#000',
-        'line-width': 2
-      }
-    });
   }
 
   processGeoJSONData() {
-    this.coordinatesArray.forEach((coordinate) => {
+    this.cameraMetadata.forEach((coordinate) => {
       const latitude = coordinate[0];
       const longitude = coordinate[1];
       const Bearingofcamera = coordinate[4];
@@ -164,7 +112,7 @@ class GeoJSONHandler {
         bearing: Bearingofcamera ,
         'popup_html': coordinate[3]
       };
-      this.imgInfoArray.push(imgInfo);
+      this.deckGLData.push(imgInfo);
 
       // Calculate destination and create points for field of view
       const originalpoint = turf.point([longitude, latitude]);
@@ -349,10 +297,10 @@ class GeoJSONHandler {
   }
 
   addExifCameraLayer() {
-    const imgInfoArray = this.imgInfoArray;
+    const imgInfoArray = this.deckGLData;
 
     // Create the exifCameraLayer
-    const exifCameraLayer = new this.deck.IconLayer({
+    const exifCameraLayer = new deck.IconLayer({
       id: 'exif-camera-layer',
       data: imgInfoArray,
       getIcon: (d) => 'marker',
@@ -378,11 +326,11 @@ class GeoJSONHandler {
 
     });
 
-    const exifCameraDeckOverlay = new this.deck.MapboxOverlay({
+    const exifCameraDeckOverlay = new deck.MapboxOverlay({
       layers: [exifCameraLayer],
     });
 
-    const deckglMrkerLayer = new this.deck.IconLayer({
+    const deckglMrkerLayer = new deck.IconLayer({
       id: 'IconLayer',
       data: imgInfoArray,
       getIcon: (d) => 'marker',
@@ -402,7 +350,7 @@ class GeoJSONHandler {
 
       });
   
-      const markerLayerdeckOverlay = new this.deck.MapboxOverlay({
+      const markerLayerdeckOverlay = new deck.MapboxOverlay({
           layers: [deckglMrkerLayer],
       });
 
@@ -444,6 +392,8 @@ class GeoJSONHandler {
   handleHover(info) {
     const { x, y, object } = info;
     const tooltipElement = document.getElementById('custom-tooltip');
+    const cardElement = document.getElementById('custom-card');
+
     this.map.getCanvas().style.cursor = 'pointer';
 
     if (object) {
@@ -460,6 +410,7 @@ class GeoJSONHandler {
         }
         
         tooltipElement.innerHTML = tooltipContent;
+        cardElement.style.display = 'none'
         tooltipElement.style.display = 'block';
         tooltipElement.style.left = x + 'px';
         tooltipElement.style.top = y + 'px';
@@ -476,6 +427,7 @@ class GeoJSONHandler {
     const { x, y, object } = info;
     const mapCanvas = this.map.getCanvas();
     const cardElement = document.getElementById('custom-card');
+    const tooltipElement = document.getElementById('custom-tooltip');
   
     mapCanvas.style.cursor = 'pointer';
   
@@ -488,9 +440,10 @@ class GeoJSONHandler {
     cardElement.style.color = '#000';
     cardElement.style.fontSize = '12px';
     cardElement.style.zIndex = 999;
-  
+    
     if (cardElement.style.display === 'none') {
       cardElement.style.display = 'block';
+      tooltipElement.style.display = 'none'
       cardElement.style.left = x + 'px';
       cardElement.style.top = y + 'px';
       

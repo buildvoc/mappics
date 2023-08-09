@@ -40,7 +40,7 @@ class MapModes {
       });
     }
   
-    addBaseMapLayers() {
+    addBaseMapLayersHandler() {
       this.map.addLayer({
         'id': 'googlehybrid',
         'type': 'raster',
