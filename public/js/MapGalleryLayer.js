@@ -32,7 +32,7 @@ class MapGalleryLayer {
 
     this.deckGLData = [];
 
-    this.addLayers();
+    // this.addLayers();
   }
 
   addLayers() {
@@ -164,131 +164,134 @@ class MapGalleryLayer {
       });
 
       // Calculate field of view polygons and add them to fieldofview3D and fieldofview3Dcontent features
-      const firstline = turf.lineString([cameraPoint, FOVresult.geometry.geometries[1].coordinates[0]]);
-      const secondline = turf.lineString([cameraPoint, FOVresult.geometry.geometries[1].coordinates[1]]);
+      // const firstline = turf.lineString([cameraPoint, FOVresult.geometry.geometries[1].coordinates[0]]);
+      // const secondline = turf.lineString([cameraPoint, FOVresult.geometry.geometries[1].coordinates[1]]);
 
-      const firstlinechunk = turf.lineChunk(firstline, 0.00001, {
-        units: 'kilometers'
-      });
-      const secondlinechunk = turf.lineChunk(secondline, 0.00001, {
-        units: 'kilometers'
-      });
+      // const firstlinechunk = turf.lineChunk(firstline, 0.00001, {
+      //   units: 'kilometers'
+      // });
+      // const secondlinechunk = turf.lineChunk(secondline, 0.00001, {
+      //   units: 'kilometers'
+      // });
 
-      for (let i = 0; i < firstlinechunk.features.length; i++) {
-        const parralellineforfirst = turf.lineChunk(
-          turf.lineString([firstlinechunk.features[i].geometry.coordinates[0], secondlinechunk.features[i].geometry.coordinates[0]]),
-          0.00002,
-          {
-            units: 'kilometers'
-          }
-        );
-        const parralellineforsecond = turf.lineChunk(
-          turf.lineString([firstlinechunk.features[i].geometry.coordinates[1], secondlinechunk.features[i].geometry.coordinates[1]]),
-          0.00002,
-          {
-            units: 'kilometers'
-          }
-        );
+      // for (let i = 0; i < firstlinechunk.features.length; i++) {
+      //   const parralellineforfirst = turf.lineChunk(
+      //     turf.lineString([firstlinechunk.features[i].geometry.coordinates[0], secondlinechunk.features[i].geometry.coordinates[0]]),
+      //     0.00002,
+      //     {
+      //       units: 'kilometers'
+      //     }
+      //   );
+      //   const parralellineforsecond = turf.lineChunk(
+      //     turf.lineString([firstlinechunk.features[i].geometry.coordinates[1], secondlinechunk.features[i].geometry.coordinates[1]]),
+      //     0.00002,
+      //     {
+      //       units: 'kilometers'
+      //     }
+      //   );
 
-        this.fieldofview3D['features'].push({
-          type: 'Feature',
-          geometry: {
-            coordinates: [
-              [
-                firstlinechunk.features[i].geometry.coordinates[0],
-                parralellineforfirst.features[0].geometry.coordinates[1],
-                parralellineforsecond.features[0].geometry.coordinates[1],
-                firstlinechunk.features[i].geometry.coordinates[1]
-              ]
-            ],
-            type: 'Polygon'
-          },
-          properties: {
-            height: (i + 130) / 130,
-            base: (i + 131) / 130
-          }
-        });
+      //   this.fieldofview3D['features'].push({
+      //     type: 'Feature',
+      //     geometry: {
+      //       coordinates: [
+      //         [
+      //           firstlinechunk.features[i].geometry.coordinates[0],
+      //           parralellineforfirst.features[0].geometry.coordinates[1],
+      //           parralellineforsecond.features[0].geometry.coordinates[1],
+      //           firstlinechunk.features[i].geometry.coordinates[1]
+      //         ]
+      //       ],
+      //       type: 'Polygon'
+      //     },
+      //     properties: {
+      //       height: (i + 130) / 130,
+      //       base: (i + 131) / 130
+      //     }
+      //   });
 
-        this.fieldofview3D['features'].push({
-          type: 'Feature',
-          geometry: {
-            coordinates: [
-              [
-                secondlinechunk.features[i].geometry.coordinates[0],
-                parralellineforfirst.features[parralellineforfirst.features.length - 1].geometry.coordinates[0],
-                parralellineforsecond.features[parralellineforsecond.features.length - 1].geometry.coordinates[0],
-                secondlinechunk.features[i].geometry.coordinates[1]
-              ]
-            ],
-            type: 'Polygon'
-          },
-          properties: {
-            height: (i + 130) / 130,
-            base: (i + 131) / 130
-          }
-        });
+      //   this.fieldofview3D['features'].push({
+      //     type: 'Feature',
+      //     geometry: {
+      //       coordinates: [
+      //         [
+      //           secondlinechunk.features[i].geometry.coordinates[0],
+      //           parralellineforfirst.features[parralellineforfirst.features.length - 1].geometry.coordinates[0],
+      //           parralellineforsecond.features[parralellineforsecond.features.length - 1].geometry.coordinates[0],
+      //           secondlinechunk.features[i].geometry.coordinates[1]
+      //         ]
+      //       ],
+      //       type: 'Polygon'
+      //     },
+      //     properties: {
+      //       height: (i + 130) / 130,
+      //       base: (i + 131) / 130
+      //     }
+      //   });
 
-        this.fieldofview3D['features'].push({
-          type: 'Feature',
-          geometry: {
-            coordinates: [
-              [
-                firstlinechunk.features[i].geometry.coordinates[0],
-                parralellineforfirst.features[0].geometry.coordinates[1],
-                parralellineforsecond.features[0].geometry.coordinates[1],
-                firstlinechunk.features[i].geometry.coordinates[1]
-              ]
-            ],
-            type: 'Polygon'
-          },
-          properties: {
-            height: (-i + 370) / 370,
-            base: (-i + 370) / 370
-          }
-        });
+      //   this.fieldofview3D['features'].push({
+      //     type: 'Feature',
+      //     geometry: {
+      //       coordinates: [
+      //         [
+      //           firstlinechunk.features[i].geometry.coordinates[0],
+      //           parralellineforfirst.features[0].geometry.coordinates[1],
+      //           parralellineforsecond.features[0].geometry.coordinates[1],
+      //           firstlinechunk.features[i].geometry.coordinates[1]
+      //         ]
+      //       ],
+      //       type: 'Polygon'
+      //     },
+      //     properties: {
+      //       height: (-i + 370) / 370,
+      //       base: (-i + 370) / 370
+      //     }
+      //   });
 
-        this.fieldofview3D['features'].push({
-          type: 'Feature',
-          geometry: {
-            coordinates: [
-              [
-                secondlinechunk.features[i].geometry.coordinates[0],
-                parralellineforfirst.features[parralellineforfirst.features.length - 1].geometry.coordinates[0],
-                parralellineforsecond.features[parralellineforsecond.features.length - 1].geometry.coordinates[0],
-                secondlinechunk.features[i].geometry.coordinates[1]
-              ]
-            ],
-            type: 'Polygon'
-          },
-          properties: {
-            height: (-i + 370) / 370,
-            base: (-i + 370) / 370
-          }
-        });
+      //   this.fieldofview3D['features'].push({
+      //     type: 'Feature',
+      //     geometry: {
+      //       coordinates: [
+      //         [
+      //           secondlinechunk.features[i].geometry.coordinates[0],
+      //           parralellineforfirst.features[parralellineforfirst.features.length - 1].geometry.coordinates[0],
+      //           parralellineforsecond.features[parralellineforsecond.features.length - 1].geometry.coordinates[0],
+      //           secondlinechunk.features[i].geometry.coordinates[1]
+      //         ]
+      //       ],
+      //       type: 'Polygon'
+      //     },
+      //     properties: {
+      //       height: (-i + 370) / 370,
+      //       base: (-i + 370) / 370
+      //     }
+      //   });
 
-        this.fieldofview3Dcontent['features'].push({
-          type: 'Feature',
-          geometry: {
-            coordinates: [
-              [
-                firstlinechunk.features[i].geometry.coordinates[0],
-                secondlinechunk.features[i].geometry.coordinates[0],
-                secondlinechunk.features[i].geometry.coordinates[1],
-                firstlinechunk.features[i].geometry.coordinates[1]
-              ]
-            ],
-            type: 'Polygon'
-          },
-          properties: {
-            height: (-i + 370) / 370,
-            base: (i + 130) / 130,
-            Bearing: Bearingofcamera,
-            URL: '/galleries/' + URLofcamera,
-            Altitude: Atitudeofcamera
-          }
-        });
-      }
+      //   this.fieldofview3Dcontent['features'].push({
+      //     type: 'Feature',
+      //     geometry: {
+      //       coordinates: [
+      //         [
+      //           firstlinechunk.features[i].geometry.coordinates[0],
+      //           secondlinechunk.features[i].geometry.coordinates[0],
+      //           secondlinechunk.features[i].geometry.coordinates[1],
+      //           firstlinechunk.features[i].geometry.coordinates[1]
+      //         ]
+      //       ],
+      //       type: 'Polygon'
+      //     },
+      //     properties: {
+      //       height: (-i + 370) / 370,
+      //       base: (i + 130) / 130,
+      //       Bearing: Bearingofcamera,
+      //       URL: '/galleries/' + URLofcamera,
+      //       Altitude: Atitudeofcamera
+      //     }
+      //   });
+      // }
     });
+
+    // Add layers after geojson data has been processed
+    this.addLayers();
 
     // Other processing and layer adding logic can go here...
     // You can call other methods from here to add layers and handle popups.
