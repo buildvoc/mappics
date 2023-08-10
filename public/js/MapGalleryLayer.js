@@ -303,30 +303,30 @@ class MapGalleryLayer {
     const imgInfoArray = this.deckGLData;
 
     // Create the exifCameraLayer
-    const exifCameraLayer = new deck.IconLayer({
-      id: 'exif-camera-layer',
-      data: imgInfoArray,
-      getIcon: (d) => 'marker',
-      getPosition: (d) => d.coordinates,
-      getColor: (d) => [203, 24, 226],
-      getSize: (d) => 2,
-      getAngle: (d) => -d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
-      iconAtlas: this.assetUrl + '/camera.png',
-      iconMapping: {
-        marker: {
-          x: 0,
-          y: 0,
-          width: 100,
-          height: 167,
-          mask: true,
-        },
-      },
-      sizeScale: 8,
-      billboard: false,
-      pickable: true,
-      onHover: this.handleHover.bind(this),
-      onClick: this.handleClick.bind(this),
-    });
+    // const exifCameraLayer = new deck.IconLayer({
+    //   id: 'exif-camera-layer',
+    //   data: imgInfoArray,
+    //   getIcon: (d) => 'marker',
+    //   getPosition: (d) => d.coordinates,
+    //   getColor: (d) => [203, 24, 226],
+    //   getSize: (d) => 2,
+    //   getAngle: (d) => -d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
+    //   iconAtlas: this.assetUrl + '/camera.png',
+    //   iconMapping: {
+    //     marker: {
+    //       x: 0,
+    //       y: 0,
+    //       width: 100,
+    //       height: 167,
+    //       mask: true,
+    //     },
+    //   },
+    //   sizeScale: 8,
+    //   billboard: false,
+    //   pickable: true,
+    //   onHover: this.handleHover.bind(this),
+    //   onClick: this.handleClick.bind(this),
+    // });
 
     const url = this.assetUrl + '/cam.gltf';
     const scenegraph = await loaders.parse(loaders.fetchFile(url), loaders.GLTFLoader);
@@ -372,7 +372,7 @@ class MapGalleryLayer {
           layers: [deckglMrkerLayer],
       });
 
-      this.map.on('click',()=>{
+      this.map.on('mousedown',()=>{
         const cardElement = document.getElementById('custom-card');
     
         if(cardElement.style.display = 'block')
