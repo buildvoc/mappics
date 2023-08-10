@@ -98,17 +98,17 @@ class MapGalleryLayer {
         },
         properties: {
           Bearing: coordinate[4],
-          URL: coordinate[2],
+          URL: URLofcamera,
           AOV: FOV,
-          Altitude: coordinate[5],
+          Altitude: Atitudeofcamera,
           'popup_html': coordinate[3]
         }
       });
 
       const imgInfo = {
-        URL: coordinate[2],
-        altitude: coordinate[5],
-        coordinates: [longitude, latitude],
+        URL: URLofcamera,
+        altitude: Atitudeofcamera,
+        coordinates: [longitude, latitude, Atitudeofcamera],
         bearing: Bearingofcamera ,
         'popup_html': coordinate[3]
       };
@@ -299,7 +299,7 @@ class MapGalleryLayer {
     this.addFieldViewLayer();
   }
 
-  addExifCameraLayer() {
+  async addExifCameraLayer() {
     const imgInfoArray = this.deckGLData;
 
     // Create the exifCameraLayer
@@ -326,11 +326,26 @@ class MapGalleryLayer {
       pickable: true,
       onHover: this.handleHover.bind(this),
       onClick: this.handleClick.bind(this),
+    });
 
+    const url = this.assetUrl + '/cam.gltf';
+    const scenegraph = await loaders.parse(loaders.fetchFile(url), loaders.GLTFLoader);
+    const exif3dCameraLayer = new deck.ScenegraphLayer({
+      id: 'mesh-layer',
+      data: imgInfoArray,
+      scenegraph: scenegraph,
+      getPosition: d => d.coordinates,
+      getColor: d => [203, 24, 226],
+      getOrientation: d => [0, - d.bearing, 90],
+      sizeScale: 1,
+      // _lighting: 'pbr',
+      pickable: true,
+      onHover: this.handleHover.bind(this),
+      onClick: this.handleClick.bind(this),
     });
 
     const exifCameraDeckOverlay = new deck.MapboxOverlay({
-      layers: [exifCameraLayer],
+      layers: [exif3dCameraLayer],
     });
 
     const deckglMrkerLayer = new deck.IconLayer({
