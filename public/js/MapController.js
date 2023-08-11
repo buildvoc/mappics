@@ -33,8 +33,6 @@ class MapController {
     setupMapModes() {
       const mapModes = new MapModes(this.map);
       mapModes.addBaseMapControl();
-      mapModes.setFog();
-      mapModes.addBaseMapLayersHandler();
     }
   
     setup3DBuildings() {
