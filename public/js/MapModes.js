@@ -5,33 +5,47 @@ class MapModes {
   
     addBaseMapControl() {
       const baseMapControl = `
-        <div class="mapboxgl-ctrl mapboxgl-ctrl-group">
-          <!-- The rest of your HTML code here -->
+      <div class="mapboxgl-ctrl mapboxgl-ctrl-group">
+
+      <div class="dropdown">
+        <button class="dropbtn" style="width: 60px; font-size: 12px;background-color: #337795;">Base Map</button>
+        <div class="dropdown-content">
+        <div id="menu" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;">
+      
+      <div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
+      <input id="os" type="radio" name="rtoggle" value="os" checked="checked" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'none'); map.setLayoutProperty('googlesatellite', 'visibility', 'none'); map.setLayoutProperty('osmstreet', 'visibility', 'none');">
+      <label for="os">Ordnance Survey</label>
+      </div>
+      
+      <div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
+      <input id="osmstreet" type="radio" name="rtoggle" value="osmstreet" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'none'); map.setLayoutProperty('googlesatellite', 'visibility', 'none'); map.setLayoutProperty('osmstreet', 'visibility', 'visible');">
+      <label for="osmstreet">OpenStreetMap Street</label>
+      </div>
+      
+      <div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
+      <input id="satellite" type="radio" name="rtoggle" value="satellite" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'none'); map.setLayoutProperty('googlesatellite', 'visibility', 'visible'); map.setLayoutProperty('osmstreet', 'visibility', 'none');">
+      <label for="satellite">Google Satellite</label>
+      </div>
+      
+      <div style="display: flex;flex-direction: row;justify-content: center;align-items: flex-start;">
+      <input id="hybrid" type="radio" name="rtoggle" value="hybrid" onClick="javascript:map.setLayoutProperty('googlehybrid', 'visibility', 'visible'); map.setLayoutProperty('googlesatellite', 'visibility', 'none'); map.setLayoutProperty('osmstreet', 'visibility', 'none');">
+      <label for="hybrid">Google Hybrid</label>
+      </div>
+      
+      </div>
         </div>
+      </div>
+      
+      
+      </div>
       `;
   
       $('.mapboxgl-ctrl-top-left').append(baseMapControl);
-      // Add click event listeners to the radio buttons to control the layers
-      this.addRadioClickListeners();
+
+      this.setFog();
+      this.addBaseMapLayersHandler();
     }
-  
-    addRadioClickListeners() {
-      // Function to handle the radio button click event and change layer visibility
-      const setLayerVisibility = (layerId) => {
-        const layers = ['googlehybrid', 'googlesatellite', 'osmstreet'];
-        for (const layer of layers) {
-          const visibility = layer === layerId ? 'visible' : 'none';
-          this.map.setLayoutProperty(layer, 'visibility', visibility);
-        }
-      };
-  
-      // Attach event listeners to the radio buttons
-      $('input[name="rtoggle"]').on('click', (event) => {
-        const layerId = $(event.target).val();
-        setLayerVisibility(layerId);
-      });
-    }
-  
+
     setFog() {
       this.map.setFog({
         'color': 'rgb(255, 255, 255)',
