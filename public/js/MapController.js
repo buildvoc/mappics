@@ -24,9 +24,11 @@ class MapController {
   
     initialize() {
       this.setupMapModes();
+      this.setupMapControls();
+
       this.setup3DBuildings();
       this.setupMapEditing();
-      this.setupMapControls();
+
       this.setupImagesOnMap();
     }
   

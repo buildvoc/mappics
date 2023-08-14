@@ -300,7 +300,7 @@ class MapGalleryLayer {
 
       this.map.on('move',(event)=>{ 
         if (isMobileDevice ) {
-          if (event && event.originalEvent && event.originalEvent.changedTouches.length > 0) {
+          if (event && event.originalEvent && event.originalEvent.changedTouches && event.originalEvent.changedTouches.length > 0) {
             const touch = event.originalEvent.changedTouches[0];
             const pickInfo = exifCameraDeckOverlay.pickObject({
               x: touch.clientX,
