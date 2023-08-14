@@ -1,0 +1,47 @@
+App\Domain\Entity\Building:
+    type: entity
+    table: buildings
+    id:
+        id:
+            type: string
+            generator: { strategy: AUTO }
+    fields:
+        osTopoToid:
+            type: string
+            nullable: true
+        osTopoToidVersion:
+            type: integer
+            nullable: true
+        bhaProcessDate:
+            type: date
+            nullable: true
+        tileRef:
+            type: string
+            nullable: true
+        absMin:
+            type: string
+            nullable: true
+        absH2:
+            type: string
+            nullable: true
+        absHMax:
+            type: string
+            nullable: true
+        relH2:
+            type: string
+            nullable: true
+        relHMax:
+            type: string
+            nullable: true
+        bhaConf:
+            type: string
+            nullable: true
+        createdAt:
+            type: datetime
+            nullable: false
+            options:
+                default: CURRENT_TIMESTAMP
+    # oneToMany:
+    #     images:
+    #         targetEntity: App\Domain\Entity\Image
+    #         mappedBy: gallery
