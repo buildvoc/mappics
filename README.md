@@ -66,6 +66,12 @@ To deploy and update Mappics you can also find a simple configuration for [https
 
 If you want to deploy a specific version you can also use the tag option: `dep deploy --tag="1.0.0"`
 
+## Deploy app to production
+Steps to deploy code on production:
+1. login to production server using credentials using ssh
+2. move to project directory /var/www/app
+3. Take pull using git pull command
+
 ## Run on your local machine
 ### Option 1 
 XAMPP is being used for development purposes
