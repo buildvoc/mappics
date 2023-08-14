@@ -115,15 +115,13 @@ class MapController {
       }
   
       const mapGalleryLayer = new MapGalleryLayer(
-          this.map,
-          this.cameraMetadata,
-          this.assetUrl,
-        );
-        mapGalleryLayer.processGeoJSONData();
+        this.map,
+        this.cameraMetadata,
+        this.assetUrl,
+      );
 
       this.setupMapData();
 
-  
       const mapMetadataLayerHandler = new MapMetadataLayerHandler(this.map, this.assetUrl, this.pointsdata);
 
       $('#loading-map').css('display', 'none');
