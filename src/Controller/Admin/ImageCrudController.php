@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 class ImageCrudController extends AbstractCrudController
 {
@@ -40,8 +41,8 @@ class ImageCrudController extends AbstractCrudController
         $description = TextField::new('description');
         $longDescription = TextField::new('longDescription');
         $createdAt = DateTimeField::new('createdAt');
-        $exifDataLatitude = TextField::new('exifData.latitude');
-        $exifDataLongitude = TextField::new('exifData.longitude');
+        $exifDataLatitude = NumberField::new('exifData.latitude');
+        $exifDataLongitude = NumberField::new('exifData.longitude');
         $exifDataAltitude = TextField::new('exifData.altitude');
         $exifDataMake = TextField::new('exifData.make');
         $exifDataModel = TextField::new('exifData.model');
