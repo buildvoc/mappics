@@ -98,7 +98,7 @@ class MapModes {
           }
         }
       });
-  
+    
       // Hide all layers by default
       this.map.setLayoutProperty('googlehybrid', 'visibility', 'none');
       this.map.setLayoutProperty('googlesatellite', 'visibility', 'none');
