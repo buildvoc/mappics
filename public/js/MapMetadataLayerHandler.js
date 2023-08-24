@@ -1,4 +1,4 @@
-class MapMetadataLayerHandler {
+class MapMetadataLayerHandler { 
     constructor(map, assetUrl, pointsdata) {
       this.map = map;
       this.assetUrl = assetUrl;
@@ -6,7 +6,7 @@ class MapMetadataLayerHandler {
         closeButton: false,
         closeOnClick: false,
         maxWidth: '500px'
-      });;
+      });
       this.pointsdata = pointsdata;
   
       this.initialize();
@@ -77,7 +77,7 @@ class MapMetadataLayerHandler {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
           }
     
-          let whattoshow = `<div style="background-color: #8b8282; color:white; padding-left: 5px; margin-bottom: 5px; display: flex;flex-direction: row;align-items: center;justify-content: space-between"><div>List Entry</div><button style="position:relative; color:white" class="mapboxgl-popup-close-button" type="button" aria-label="Close popup" onClick="popup1.remove();">×</button></div>`;
+          let whattoshow = `<div style="background-color: #8b8282; color:white; padding-left: 5px; margin-bottom: 5px; display: flex;flex-direction: row;align-items: center;justify-content: space-between"><div>List Entry</div><button style="position:relative; color:white" class="mapboxgl-popup-close-button" type="button" aria-label="Close popup" onClick="closeClickPopup();">×</button></div>`;
     
           const propertieskeys = Object.keys(e.features[0].properties);
           for (let i = 0; i < propertieskeys.length; i++) {
@@ -88,10 +88,18 @@ class MapMetadataLayerHandler {
             }
           }
     
-          this.popup.setLngLat(coordinates).setHTML(whattoshow).addTo(this.map);
+          clickPopup.setLngLat(coordinates).setHTML(whattoshow).addTo(this.map);
         });
       });
     }
+  }
 
-  
+  // Kept outside class because closeClickPopup functions needs to provided in the onClick callback of the close button added to plain html.
+  var clickPopup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: true,
+    maxWidth: '500px'
+  });
+  function closeClickPopup() {
+    clickPopup.remove();
   }
