@@ -18,3 +18,7 @@ imageModal:
 about:
     path:      /about
     controller: App\Infrastructure\Controller\MappicsController::about
+
+admin:
+    path:      /admin
+    controller: App\Controller\Admin\DashboardController::index
