@@ -38,8 +38,21 @@ class MapController {
     }
   
     setup3DBuildings() {
+      
+      this.map.addSource('mapbox-dem', {
+        'type': 'raster-dem',
+        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        'tileSize': 512,
+        'maxzoom': 14
+      });
+      // add the DEM source as a terrain layer with exaggerated height
+      this.map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+  
+
       const mapLayersHandler = new MapLayersHandler(this.map, this.parsed3dbuildings);
       mapLayersHandler.setupBuildingLayers();
+
+
     }
   
     setupMapEditing() {
