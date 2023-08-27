@@ -41,7 +41,7 @@ class MapGalleryLayer {
       const latitude = coordinate[0];
       const longitude = coordinate[1];
       const Bearingofcamera = coordinate[4];
-      const Atitudeofcamera = coordinate[5];
+      const Alitudeofcamera = coordinate[5];
       const URLofcamera = coordinate[2];
       const f = coordinate[9];
       const fquiv = (coordinate[9] * 35) / coordinate[8];
@@ -57,15 +57,15 @@ class MapGalleryLayer {
           Bearing: coordinate[4],
           URL: URLofcamera,
           AOV: FOV,
-          Altitude: Atitudeofcamera,
+          Altitude: Alitudeofcamera,
           'popup_html': coordinate[3]
         }
       });
 
       const imgInfo = {
         URL: URLofcamera,
-        altitude: Atitudeofcamera,
-        coordinates: [longitude, latitude, Atitudeofcamera],
+        altitude: Alitudeofcamera,
+        coordinates: [longitude, latitude, Alitudeofcamera],
         bearing: Bearingofcamera ,
         'popup_html': coordinate[3]
       };
@@ -587,6 +587,20 @@ class MapGalleryLayer {
 
     this.map.getCanvas().style.cursor = 'pointer';
 
+     
+    const coordinates = info.coordinate;
+
+    console.log(coordinates);
+    const lngLat = {
+      lng: coordinates[0],
+      lat: coordinates[1]
+    };
+    const elevation = Math.floor( 
+      // Do not use terrain exaggeration to get actual meter values
+      this.map.queryTerrainElevation(lngLat, { exaggerated: false })
+    );
+    console.log(elevation, "elevation");
+
     if (object) {
         const tooltipContent = `
         <img src="/galleries/${object.URL}" alt="Click to view full image">
@@ -621,8 +635,11 @@ class MapGalleryLayer {
     const tooltipElement = document.getElementById('custom-tooltip');
   
     mapCanvas.style.cursor = 'pointer';
-  
+
+
+
     const coordinates = info.coordinate;
+  
     while (Math.abs(info.viewport.longitude - coordinates[0]) > 180) {
       coordinates[0] += info.viewport.longitude > coordinates[0] ? 360 : -360;
     }
@@ -648,4 +665,5 @@ class MapGalleryLayer {
     if(tooltipElement.style.display = 'block')
       tooltipElement.style.display = 'none';
   }
+
 }
