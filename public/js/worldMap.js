@@ -2,10 +2,15 @@ var mapElement = document.getElementById('map');
 var mapboxApiKey = mapElement.dataset.mapboxapikey;
 var parsed3dbuildings = JSON.parse(mapElement.dataset.buildings);
 // var imgcontents = JSON.parse(mapElement.dataset.imgcontentarray);
-
+console.log(parsed3dbuildings);
 $('.info').css('top', '0');
 $('.info').css('left', '30%');
 
+// Bounds for UK
+const bounds = [
+    [-7.57216793459, 49.959999905], // Southwest coordinates
+    [1.68153079591, 58.6350001085] // Northeast coordinates
+];
 mapboxgl.accessToken = 'pk.eyJ1Ijoibm91ZmVsZ2hheWF0aSIsImEiOiJja3lmNWwwemEwOXNuMnhxcm9qNDF2ZXRhIn0.n0EDO6c611aAGh4r9-FwSg';
 var map = new mapboxgl.Map({
     container: 'map',
@@ -19,6 +24,7 @@ var map = new mapboxgl.Map({
     hash: true,
     antialias: true,
     maxZoom: 21,
+    maxBounds: bounds, // Set the map's geographical boundaries.
     transformRequest: (url, resourceType) => {
         if (resourceType !== 'Image' && !url.includes('google') && !url.includes('openstreet') && !url.includes('opentopo') && !url.includes('osmbuildings') && !url.includes('edited3Dbuildings')) {
             return {
@@ -27,6 +33,7 @@ var map = new mapboxgl.Map({
         }
     }
 });
+
 
 localStorage.setItem('name', 'ejioforched');
 localStorage.getItem('name');
@@ -52,5 +59,24 @@ var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 
 map.on('load', () => {
     const mapController = new MapController(map, parsed3dbuildings, geojsoncontents, coordinatesArray, assetUrl);
-    mapController.initialize();
+
+    map.once('idle', (e) => {
+        coordinatesArray.forEach((coordinate) => {
+            const latitude = coordinate[0];
+            const longitude = coordinate[1];
+
+            const lngLat = {
+                lng: longitude,
+                lat: latitude
+            };
+            const elevation = Math.floor(
+                map.queryTerrainElevation(lngLat, { exaggerated: true })
+            );
+            
+            coordinate[5] = elevation + coordinate[5];
+        })
+        
+        mapController.initialize();
+
+    });
 });
