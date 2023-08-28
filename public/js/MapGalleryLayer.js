@@ -36,6 +36,8 @@ class MapGalleryLayer {
     // this.setupFieldOfViewLayers();
   }
 
+
+
   setupExifCameraLayers() {
     this.cameraMetadata.forEach((coordinate) => {
       const latitude = coordinate[0];
@@ -46,6 +48,8 @@ class MapGalleryLayer {
       const f = coordinate[9];
       const fquiv = (coordinate[9] * 35) / coordinate[8];
       const FOV = (2 * Math.atan(fquiv / (2 * f))) * (180 / Math.PI);
+
+
 
       this.newExifcamera['features'].push({
         type: 'Feature',
@@ -260,6 +264,7 @@ class MapGalleryLayer {
 
     const url = this.assetUrl + '/cam.gltf';
     const scenegraph = await loaders.parse(loaders.fetchFile(url), loaders.GLTFLoader);
+
     const exif3dCameraLayer = new deck.ScenegraphLayer({
       id: 'mesh-layer',
       data: imgInfoArray,
@@ -267,6 +272,10 @@ class MapGalleryLayer {
       getPosition: d => d.coordinates,
       getColor: d => [203, 24, 226],
       getOrientation: d => [0, - d.bearing, 90],
+      updateTriggers: {
+        // This tells deck.gl to recalculate radius when `currentYear` changes
+        getPosition: [imgInfoArray]
+      },
       sizeScale: 1,
       // _lighting: 'pbr',
       pickable: true,
@@ -285,6 +294,10 @@ class MapGalleryLayer {
       getPosition: d => d.coordinates,
       getColor: d => [Math.sqrt(d.exits), 140, 0],
       getSize: d => 5,
+      updateTriggers: {
+        // This tells deck.gl to recalculate radius when `currentYear` changes
+        getPosition: [imgInfoArray]
+      },
       // getAngle: (d) => - d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
       sizeScale: 8,
       billboard: true,
@@ -322,6 +335,39 @@ class MapGalleryLayer {
       })
       
       this.map.addControl(exifCameraDeckOverlay);
+
+      map.on('moveend', () => {
+        // Update elevation data for each coordinate
+        imgInfoArray.forEach((info) => {
+          const latitude = info.coordinates[1];
+          const longitude = info.coordinates[0];
+  
+          const lngLat = {
+              lng: longitude,
+              lat: latitude
+          };
+          const elevation = Math.floor(
+              map.queryTerrainElevation(lngLat, { exaggerated: false })
+          );
+          console.log(elevation);
+          info.coordinates[2] = elevation + info.altitude;
+      });
+    
+        // Create a new array with updated data
+        const updatedImgInfoArray = imgInfoArray.map(info => ({
+          ...info,
+          coordinates: [info.coordinates[0], info.coordinates[1], info.coordinates[2]],
+        }));
+  
+
+        exif3dCameraLayer.props.data = updatedImgInfoArray;
+        deckglMrkerLayer.props.data = updatedImgInfoArray;
+
+        // Trigger a redraw of the layers
+        exif3dCameraLayer.setChangeFlags({ dataChanged: true });
+        deckglMrkerLayer.setChangeFlags({ dataChanged: true });
+    });
+  
   }
 
   setupFieldOfViewLayers() {

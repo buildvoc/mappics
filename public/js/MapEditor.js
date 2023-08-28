@@ -69,7 +69,7 @@ class MapEditor {
         console.log(error);
       }
     }
-  
+  //parsed 3d buildings functionality should be here and renamed for 3d buildings
     async handleUploadButtonClick() {
       $('#insideinfo').css('display', 'none');
       parsed3dbuildings.features.push(this.draw.getAll().features[0]);

@@ -56,29 +56,27 @@ var assetUrl = mapElement.dataset.asseturl;
 var coordinatesArray = JSON.parse(mapElement.dataset.coordinates);
 var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 
-map.on('load', () => {
+map.on('load', async () => {
     const mapController = new MapController(map, parsed3dbuildings, geojsoncontents, coordinatesArray, assetUrl);
+
+    await map.once('idle');
+
+
+    coordinatesArray.forEach((coordinate) => {
+        const latitude = coordinate[0];
+        const longitude = coordinate[1];
+
+        const lngLat = {
+            lng: longitude,
+            lat: latitude
+        };
+        const elevation = Math.floor(
+            map.queryTerrainElevation(lngLat, { exaggerated: false })
+        );
+        console.log(elevation);
+        coordinate[5] = elevation + coordinate[5];
+    })
+       
     mapController.initialize();
 
-    map.once('idle', () => {
-        try {
-        coordinatesArray.forEach((coordinate) => {
-            const latitude = coordinate[0];
-            const longitude = coordinate[1];
-
-            const lngLat = {
-                lng: longitude,
-                lat: latitude
-            };
-            const elevation = Math.floor(
-                map.queryTerrainElevation(lngLat, { exaggerated: true })
-            );
-            
-            coordinate[5] = elevation + coordinate[5];
-        })
-
-        } catch (error) {
-            console.error('An error occurred:', error);
-        }
-    });
 });
