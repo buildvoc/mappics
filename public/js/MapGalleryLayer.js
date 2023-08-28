@@ -589,17 +589,16 @@ class MapGalleryLayer {
 
      
     const coordinates = info.coordinate;
-
-    console.log(coordinates);
-    const lngLat = {
-      lng: coordinates[0],
-      lat: coordinates[1]
-    };
-    const elevation = Math.floor( 
-      // Do not use terrain exaggeration to get actual meter values
-      this.map.queryTerrainElevation(lngLat, { exaggerated: false })
-    );
-    console.log(elevation, "elevation");
+    if (coordinates) {
+      const lngLat = {
+        lng: coordinates[0],
+        lat: coordinates[1]
+      };
+      const elevation = Math.floor( 
+        // Do not use terrain exaggeration to get actual meter values
+        this.map.queryTerrainElevation(lngLat, { exaggerated: false })
+      );
+    }
 
     if (object) {
         const tooltipContent = `
