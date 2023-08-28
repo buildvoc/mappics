@@ -2,7 +2,7 @@ var mapElement = document.getElementById('map');
 var mapboxApiKey = mapElement.dataset.mapboxapikey;
 var parsed3dbuildings = JSON.parse(mapElement.dataset.buildings);
 // var imgcontents = JSON.parse(mapElement.dataset.imgcontentarray);
-console.log(parsed3dbuildings);
+
 $('.info').css('top', '0');
 $('.info').css('left', '30%');
 
@@ -28,7 +28,6 @@ var map = new mapboxgl.Map({
     }
 });
 
-
 localStorage.setItem('name', 'ejioforched');
 localStorage.getItem('name');
 
@@ -53,8 +52,10 @@ var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 
 map.on('load', () => {
     const mapController = new MapController(map, parsed3dbuildings, geojsoncontents, coordinatesArray, assetUrl);
+    mapController.initialize();
 
-    map.on('idle', (e) => {
+    map.once('idle', () => {
+        try {
         coordinatesArray.forEach((coordinate) => {
             const latitude = coordinate[0];
             const longitude = coordinate[1];
@@ -70,8 +71,9 @@ map.on('load', () => {
             
             coordinate[5] = elevation;
         })
-        
-        mapController.initialize();
 
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
     });
 });
