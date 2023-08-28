@@ -54,7 +54,7 @@ var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
 map.on('load', () => {
     const mapController = new MapController(map, parsed3dbuildings, geojsoncontents, coordinatesArray, assetUrl);
 
-    map.on('idle', (e) => {
+    map.once('idle', (e) => {
         coordinatesArray.forEach((coordinate) => {
             const latitude = coordinate[0];
             const longitude = coordinate[1];
