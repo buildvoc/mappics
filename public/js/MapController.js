@@ -36,7 +36,7 @@ class MapController {
       this.setupMapControls();
 
       this.setup3DBuildings();
-      this.setupMapEditing();
+      // this.setupMapEditing();
 
       this.setupImagesOnMap();
     }
