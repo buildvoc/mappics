@@ -6,6 +6,11 @@ console.log(parsed3dbuildings);
 $('.info').css('top', '0');
 $('.info').css('left', '30%');
 
+// Bounds for UK
+const bounds = [
+    [-7.57216793459, 49.959999905], // Southwest coordinates
+    [1.68153079591, 58.6350001085] // Northeast coordinates
+];
 mapboxgl.accessToken = 'pk.eyJ1Ijoibm91ZmVsZ2hheWF0aSIsImEiOiJja3lmNWwwemEwOXNuMnhxcm9qNDF2ZXRhIn0.n0EDO6c611aAGh4r9-FwSg';
 var map = new mapboxgl.Map({
     container: 'map',
@@ -19,6 +24,7 @@ var map = new mapboxgl.Map({
     hash: true,
     antialias: true,
     maxZoom: 21,
+    maxBounds: bounds, // Set the map's geographical boundaries.
     transformRequest: (url, resourceType) => {
         if (resourceType !== 'Image' && !url.includes('google') && !url.includes('openstreet') && !url.includes('opentopo') && !url.includes('osmbuildings') && !url.includes('edited3Dbuildings')) {
             return {
