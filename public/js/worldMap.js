@@ -64,11 +64,10 @@ map.on('load', () => {
                 lat: latitude
             };
             const elevation = Math.floor(
-                // Do not use terrain exaggeration to get actual meter values
                 map.queryTerrainElevation(lngLat, { exaggerated: true })
             );
             
-            coordinate[5] = elevation;
+            coordinate[5] = elevation + coordinate[5];
         })
         
         mapController.initialize();
