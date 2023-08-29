@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Domain\Entity\Gallery;
 use App\Domain\Entity\Image;
+use App\Domain\Entity\Building;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -40,9 +41,9 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Galleries', 'fas fa-images', Gallery::class);
         yield MenuItem::linkToCrud('Images', 'far fa-image', Image::class);
+        yield MenuItem::linkToCrud('Buildings', 'fas fa-building', Building::class);
     }
 
     public function configureUserMenu(UserInterface $user): UserMenu
