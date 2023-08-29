@@ -1,31 +1,63 @@
+var mapElement = document.getElementById('map');
+var mapboxApiKey = mapElement.dataset.mapboxapikey;
+var parsed3dbuildings = JSON.parse(mapElement.dataset.buildings);
+// var imgcontents = JSON.parse(mapElement.dataset.imgcontentarray);
 
-var map = document.getElementById('worldmap');
-var coordinatesArray = JSON.parse(map.dataset.coordinates);
-var mapboxApiKey = map.dataset.mapboxapikey;
+$('.info').css('top', '0');
+$('.info').css('left', '30%');
 
-var mymap = L.map('worldmap').setView([0, 0], 1.5);
-L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-    tileSize: 512,
-    maxZoom: 18,
-    zoomOffset: -1,
-    id: 'mapbox/streets-v11',
-    accessToken: mapboxApiKey
-}).addTo(mymap);
+// Bounds for UK
+const bounds = [
+    [-7.57216793459, 49.959999905], // Southwest coordinates
+    [1.68153079591, 58.6350001085] // Northeast coordinates
+];
+mapboxgl.accessToken = 'pk.eyJ1Ijoibm91ZmVsZ2hheWF0aSIsImEiOiJja3lmNWwwemEwOXNuMnhxcm9qNDF2ZXRhIn0.n0EDO6c611aAGh4r9-FwSg';
+var map = new mapboxgl.Map({
+    container: 'map',
+    // style: 'https://api.os.uk/maps/vector/v1/vts/resources/styles?key=' + mapboxApiKey,
+    style: 'https://api.os.uk/maps/vector/v1/vts/resources/styles?key=wCujufkC5D7bjVRTf5goHOSQSu8lLAbT',
+    center: [-0.098136, 51.513813],
+    zoom: 16.5,
+    maxPitch: 85,
+    pitch: 37,
+    bearing: -63.4,
+    hash: true,
+    antialias: true,
+    maxZoom: 21,
+    maxBounds: bounds, // Set the map's geographical boundaries.
+    transformRequest: (url, resourceType) => {
+        if (resourceType !== 'Image' && !url.includes('google') && !url.includes('openstreet') && !url.includes('opentopo') && !url.includes('osmbuildings') && !url.includes('edited3Dbuildings')) {
+            return {
+                url: url + '&srs=3857'
+            }
+        }
+    }
+});
 
-var i;
-markers = [];
-for (i = 0; i < coordinatesArray.length; i++) {
-    var greenIcon = L.icon({
-        iconUrl: '/galleries/' + coordinatesArray[i][2],
-        iconSize: [35, 35],
-        iconAnchor: [35, 35],
-        popupAnchor: [-17, -17]
-    });
-    marker = L.marker( [ coordinatesArray[i][0], coordinatesArray[i][1] ], {icon: greenIcon} ).addTo(mymap);
-    marker.bindPopup(coordinatesArray[i][3]);
-    markers.push(marker);
-}
+localStorage.setItem('name', 'ejioforched');
+localStorage.getItem('name');
 
-var group = new L.featureGroup(markers);
-mymap.fitBounds(group.getBounds());
+sessionStorage.setItem('map', 'maptiler');
+
+// use of popup1 base.html.twig
+const popup1 = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: true,
+    maxWidth: '500px'
+});
+
+const popupMappics = new mapboxgl.Popup({
+    closeButton: true,
+    closeOnClick: true,
+    maxWidth: '500px'
+});
+
+var assetUrl = mapElement.dataset.asseturl;
+var coordinatesArray = JSON.parse(mapElement.dataset.coordinates);
+var geojsoncontents = JSON.parse(mapElement.dataset.filescontentarray);
+
+map.on('load', async () => {
+    const mapController = new MapController(map, parsed3dbuildings, geojsoncontents, coordinatesArray, assetUrl);
+    mapController.initialize();
+
+});

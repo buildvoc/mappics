@@ -31,3 +31,15 @@ App\Domain\Entity\ExifData:
         takenAt:
             type: datetime_immutable
             nullable: true
+        gpsImgDirection:
+            type: string
+            nullable: true
+        gpsLatitudeRef:
+            type: string
+            nullable: true
+        gpsLongitudeRef:
+            type: string
+            nullable: true
+        focalLengthIn35mmFilm:
+            type: string
+            nullable: true

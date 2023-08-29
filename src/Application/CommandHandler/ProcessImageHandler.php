@@ -67,7 +67,6 @@ class ProcessImageHandler
             $newImage = true;
             $this->logger->info('New image ' . $imageFileInfo->getFilename() . ' in gallery ' . $gallery->getName());
         }
-
         if ($newImage) {
             try {
                 $image = new Image(

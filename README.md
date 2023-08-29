@@ -66,16 +66,38 @@ To deploy and update Mappics you can also find a simple configuration for [https
 
 If you want to deploy a specific version you can also use the tag option: `dep deploy --tag="1.0.0"`
 
-## Run on your local machine
+## Deploy app to production
+Steps to deploy code on production:
+1. login to production server using credentials using ssh
+2. move to project directory /var/www/app
+3. Take pull using git pull command
 
+## Run on your local machine
+### Option 1 
+XAMPP is being used for development purposes
+1. Clone project in C:/xampp/htdocs/ [Whatever directory you have xampp installed] directory. https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/7.4.33/xampp-windows-x64-7.4.33-0-VC15-installer.exe/download 
+2. Clone command: git clone https://github.com/buildvoc/mappics.git (second branch)
+3. Go inside mappics directory and run composer install command
+4. Run mp_db.sql file in phpmyadmin or using heidisql tool or download https://www.phpmyadmin.net/ 
+5. Open .env file and update your DB connection:
+6. DATABASE_URL="mysql://root:@localhost:3306/mp_db
+7. Run this command php -S localhost:8000 -t public/ to start server from root directory.
+8. run http://localhost/phpmyadmin
+9. Add a session, then under that session ran the script on test db. and this is how it looks, the columns are added.
+10. Place your images in the `<root>/var/galleries` directory (Mappics supports `jpg` and `png` images), organized in folders (they will become galleries).
+11. Place your geojson file in `<root>/var/galleries` directory.
+11. run the console command `bin/console mappics:process-galleries` from the `<root>` directory
+12. go to the home page and enjoy your photos!
+
+### Option 2
 The suggested way to run and work on Mappics in a local enviroment is [Docker](https://www.docker.com/):
 
 1. [install Docker](https://www.docker.com/get-started) on your machine
 2. clone the repository: `git clone git@github.com:antodippo/mappics.git`
 3. build Mappics application: `make setup`
 4. run tests: `make test`
-6. run application: `make start`
-7. browse Mappics on http://localhost:8080
-8. stop application: `make stop`
+5. run application: `make start`
+6. browse Mappics on http://localhost:8080
+7. stop application: `make stop`
 
 You should get an empty Mappics home page. To fill it, see the "Usage" paragraph.

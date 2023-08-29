@@ -32,7 +32,12 @@ class AntoDippoExifReader implements ExifReader
             (string) $exifData->getCameraData()->getAperture(),
             (string) $exifData->getCameraData()->getFocalLength(),
             (string) $exifData->getCameraData()->getISOSpeed(),
-            $exifData->getFileData()->getTakenDate()->getDateTime()
+            $exifData->getGeoLocation()->getDirection()->getFloat(),
+            $exifData->getFileData()->getTakenDate()->getDateTime(),
+            $exifData->getCameraData()->getFocalLengthIn35MmFilm(),
+            (string) $exifData->getCameraData()->getGpsLatitudeRef(),
+            (string) $exifData->getCameraData()->getGpsLongitudeRef(),
+
         );
     }
 }

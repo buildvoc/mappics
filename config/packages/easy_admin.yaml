@@ -6,6 +6,7 @@ easy_admin:
         menu:
             - { entity: 'Gallery', label: 'Galleries', icon: 'images' }
             - { entity: 'Image', label: 'Images', icon: 'image' }
+            - { entity: 'Building', label: 'Buildings', icon: 'building' }
     entities:
         Gallery:
             class: App\Domain\Entity\Gallery
@@ -55,3 +56,36 @@ easy_admin:
                     - 'exifData.latitude'
                     - 'exifData.longitude'
                     - 'exifData.takenAt'
+        Building:
+            class: App\Domain\Entity\Building
+            label: 'Buildings'
+            # disabled_actions: ['new']
+            list:
+                fields:
+                    - { property: 'osTopoToid', label: 'OS Topo Toid' }
+                    - { property: 'absMin', label: 'ABS Min' }
+                    - { property: 'absH2', label: 'ABS H2' }
+                    - { property: 'absHMax', label: 'ABS H Max' }
+                    - { property: 'relH2', label: 'Rel H2' }
+                    - { property: 'relHMax', label: 'Rel H Max' }
+                    - { property: 'bhaConf', label: 'BHA Conf' }
+                    - { property: 'createdAt', label: 'Created At' }
+                sort: 'createdAt'
+                actions:
+                    - { name: 'show', icon: 'eye', label: 'Details' }
+                    - { name: 'edit', icon: 'edit', label: 'Edit' }
+                    - { name: 'delete', icon: 'trash-alt', label: 'Delete' }
+                batch_actions: ['delete']
+            # new:
+            #     fields:
+            #         - '-id'
+            show:
+                fields:
+                    - { property: 'osTopoToid', label: 'OS Topo Toid' }
+                    - { property: 'absMin', label: 'ABS Min' }
+                    - { property: 'absH2', label: 'ABS H2' }
+                    - { property: 'absHMax', label: 'ABS H Max' }
+                    - { property: 'relH2', label: 'Rel H2' }
+                    - { property: 'relHMax', label: 'Rel H Max' }
+                    - { property: 'bhaConf', label: 'BHA Conf' }
+                    - { property: 'createdAt', label: 'Created At' }
