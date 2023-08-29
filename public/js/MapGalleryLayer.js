@@ -257,14 +257,13 @@ class MapGalleryLayer {
   }
 
   async addExifCameraLayers() {
-    const imgInfoArray = this.deckGLData;
+    var imgInfoArray = this.deckGLData;
 
     const isMobileDevice = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     const hoverCallback = isMobileDevice ? null : this.onHover.bind(this);
 
     const url = this.assetUrl + '/cam.gltf';
     const scenegraph = await loaders.parse(loaders.fetchFile(url), loaders.GLTFLoader);
-
     const exif3dCameraLayer = new deck.ScenegraphLayer({
       id: 'mesh-layer',
       data: imgInfoArray,
@@ -272,10 +271,10 @@ class MapGalleryLayer {
       getPosition: d => d.coordinates,
       getColor: d => [203, 24, 226],
       getOrientation: d => [0, - d.bearing, 90],
-      updateTriggers: {
-        // This tells deck.gl to recalculate radius when `currentYear` changes
-        getPosition: [imgInfoArray]
-      },
+      // updateTriggers: {
+      //   // This tells deck.gl to recalculate radius when `currentYear` changes
+      //   getPosition: [imgInfoArray]
+      // },
       sizeScale: 1,
       // _lighting: 'pbr',
       pickable: true,
@@ -294,10 +293,10 @@ class MapGalleryLayer {
       getPosition: d => d.coordinates,
       getColor: d => [Math.sqrt(d.exits), 140, 0],
       getSize: d => 5,
-      updateTriggers: {
-        // This tells deck.gl to recalculate radius when `currentYear` changes
-        getPosition: [imgInfoArray]
-      },
+      // updateTriggers: {
+      //   // This tells deck.gl to recalculate radius when `currentYear` changes
+      //   getPosition: [imgInfoArray]
+      // },
       // getAngle: (d) => - d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
       sizeScale: 8,
       billboard: true,
@@ -336,37 +335,58 @@ class MapGalleryLayer {
       
       this.map.addControl(exifCameraDeckOverlay);
 
-      map.on('moveend', () => {
-        // Update elevation data for each coordinate
-        imgInfoArray.forEach((info) => {
-          const latitude = info.coordinates[1];
-          const longitude = info.coordinates[0];
-  
-          const lngLat = {
-              lng: longitude,
-              lat: latitude
-          };
-          const elevation = Math.floor(
-              map.queryTerrainElevation(lngLat, { exaggerated: false })
-          );
-          console.log(elevation);
-          info.coordinates[2] = elevation + info.altitude;
-      });
-    
-        // Create a new array with updated data
-        const updatedImgInfoArray = imgInfoArray.map(info => ({
-          ...info,
-          coordinates: [info.coordinates[0], info.coordinates[1], info.coordinates[2]],
-        }));
-  
+      // Define the adjustMarkerElevation function
+      function adjustMarkerElevation(data, map) {
+        data.forEach((info) => {
+            const latitude = info.coordinates[1];
+            const longitude = info.coordinates[0];
 
-        exif3dCameraLayer.props.data = updatedImgInfoArray;
-        deckglMrkerLayer.props.data = updatedImgInfoArray;
+            const lngLat = {
+                lng: longitude,
+                lat: latitude
+            };
+            const elevation = Math.floor(
+                map.queryTerrainElevation(lngLat, { exaggerated: false })
+            );
+
+            // Update the z-coordinate (altitude) while preserving the original altitude
+            info.coordinates[2] = elevation + info.altitude;
+        });
+      }
+
+      this.map.once('idle', () => {
+        // Call the adjustMarkerElevation function to update the data
+        adjustMarkerElevation(imgInfoArray, this.map);
+
+        // Update the data of the DeckGL layers with the adjusted imgInfoArray
+        exif3dCameraLayer.props.data = imgInfoArray;
+        deckglMrkerLayer.props.data = imgInfoArray;
 
         // Trigger a redraw of the layers
         exif3dCameraLayer.setChangeFlags({ dataChanged: true });
         deckglMrkerLayer.setChangeFlags({ dataChanged: true });
-    });
+
+        // const currentStyle = this.map.getStyle();
+        // this.map.setStyle(currentStyle);
+        // console.log(deck.setProps);
+        // deck.redraw(true);
+      });
+
+      this.map.on('moveend', () => {
+        imgInfoArray = this.deckGLData; 
+        // Call the adjustMarkerElevation function to update the data
+        adjustMarkerElevation(imgInfoArray, this.map);
+
+        // Update the data of the DeckGL layers with the adjusted imgInfoArray
+        exif3dCameraLayer.props.data = imgInfoArray;
+        deckglMrkerLayer.props.data = imgInfoArray;
+
+        // Trigger a redraw of the layers
+        exif3dCameraLayer.setChangeFlags({ dataChanged: true });
+        deckglMrkerLayer.setChangeFlags({ dataChanged: true });
+
+      });
+
   
   }
 
