@@ -20,4 +20,4 @@ security:
                 realm: Secured Area
 
     access_control:
-        - { path: ^/mappics-admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }

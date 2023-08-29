@@ -80,3 +80,6 @@ services:
     App\Application\CommandHandler\ResizeImageHandler:
         tags:
             - { name: tactician.handler, typehints: true }
+
+    security.csrf.token_manager:
+        class: Symfony\Component\Security\Csrf\CsrfTokenManager

@@ -1,4 +1,3 @@
-
 galleries:
     path: /
     controller: App\Infrastructure\Controller\MappicsController::galleries
@@ -18,3 +17,7 @@ imageModal:
 about:
     path:      /about
     controller: App\Infrastructure\Controller\MappicsController::about
+
+dashboard:
+    path:      /admin
+    controller: App\Controller\Admin\DashboardController::index
