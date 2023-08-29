@@ -253,7 +253,10 @@ class MapGalleryLayer {
   }
 
   async addExifCameraLayers() {
-    const imgInfoArray = this.deckGLData;
+    var dynamicMarkerData = this.deckGLData;
+
+    await map.once('idle');
+    adjustMarkerElevation(dynamicMarkerData, this.map);
 
     const isMobileDevice = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     const hoverCallback = isMobileDevice ? null : this.onHover.bind(this);
@@ -262,11 +265,15 @@ class MapGalleryLayer {
     const scenegraph = await loaders.parse(loaders.fetchFile(url), loaders.GLTFLoader);
     const exif3dCameraLayer = new deck.ScenegraphLayer({
       id: 'mesh-layer',
-      data: imgInfoArray,
+      data: dynamicMarkerData,
       scenegraph: scenegraph,
       getPosition: d => d.coordinates,
       getColor: d => [203, 24, 226],
       getOrientation: d => [0, - d.bearing, 90],
+      // updateTriggers: {
+      //   // This tells deck.gl to recalculate radius when `currentYear` changes
+      //   getPosition: [imgInfoArray]
+      // },
       sizeScale: 1,
       // _lighting: 'pbr',
       pickable: true,
@@ -276,7 +283,7 @@ class MapGalleryLayer {
 
     const deckglMrkerLayer = new deck.IconLayer({
       id: 'IconLayer',
-      data: imgInfoArray,
+      data: dynamicMarkerData,
       getIcon: (d) => 'marker',
       iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
       iconMapping: {
@@ -285,6 +292,10 @@ class MapGalleryLayer {
       getPosition: d => d.coordinates,
       getColor: d => [Math.sqrt(d.exits), 140, 0],
       getSize: d => 5,
+      // updateTriggers: {
+      //   // This tells deck.gl to recalculate radius when `currentYear` changes
+      //   getPosition: [imgInfoArray]
+      // },
       // getAngle: (d) => - d.bearing, // negative of bearing as deck.gl uses counter clockwise rotations.
       sizeScale: 8,
       billboard: true,
@@ -322,6 +333,42 @@ class MapGalleryLayer {
       })
       
       this.map.addControl(exifCameraDeckOverlay);
+
+      // Define the adjustMarkerElevation function
+      function adjustMarkerElevation(data, map) {
+        data.forEach((info) => {
+            const latitude = info.coordinates[1];
+            const longitude = info.coordinates[0];
+
+            const lngLat = {
+                lng: longitude,
+                lat: latitude
+            };
+            const elevation = Math.floor(
+                map.queryTerrainElevation(lngLat, { exaggerated: false })
+            );
+
+            // Update the z-coordinate (altitude) while preserving the original altitude
+            info.coordinates[2] = elevation + info.altitude;
+        });
+      }
+
+      this.map.on('moveend', () => {
+        dynamicMarkerData = this.deckGLData; 
+        // Call the adjustMarkerElevation function to update the data
+        adjustMarkerElevation(dynamicMarkerData, this.map);
+
+        // Update the data of the DeckGL layers with the adjusted imgInfoArray
+        exif3dCameraLayer.props.data = dynamicMarkerData;
+        deckglMrkerLayer.props.data = dynamicMarkerData;
+
+        // Trigger a redraw of the layers
+        exif3dCameraLayer.setChangeFlags({ dataChanged: true });
+        deckglMrkerLayer.setChangeFlags({ dataChanged: true });
+
+      });
+
+  
   }
 
   setupFieldOfViewLayers() {
