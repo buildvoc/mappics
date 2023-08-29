@@ -2,7 +2,7 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "^7.4",
+        "php": "^8.1",
         "ext-curl": "*",
         "ext-exif": "*",
         "ext-iconv": "*",
@@ -10,11 +10,11 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "ext-zlib": "*",
-        "antodippo/exif-reader": "^0.1.0",
+        "abdelrahmanelmaghraby/exif-reader": "*",
         "doctrine/doctrine-bundle": "^2.7",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.16",
-        "easycorp/easyadmin-bundle": "^3.5",
+        "easycorp/easyadmin-bundle": "^4.7",
         "gumlet/php-image-resize": "^1.9",
         "guzzlehttp/guzzle": "^6.3",
         "javiereguiluz/easyslugger": "^1.0",
@@ -24,29 +24,34 @@
         "nette/finder": "^2.4",
         "phake/phake": "^3.0",
         "ramsey/uuid": "^3.7",
-        "sensiolabs/security-checker": "^5.0",
-        "symfony/asset": "^4.0",
-        "symfony/console": "^4.0",
-        "symfony/dotenv": "^4.1",
+        "symfony/asset": "^5.4",
+        "symfony/console": "^5.4",
+        "symfony/dotenv": "^5.4",
         "symfony/flex": "^1.0",
-        "symfony/framework-bundle": "^4.1",
-        "symfony/lock": "^4.1",
+        "symfony/framework-bundle": "^5.4",
+        "symfony/lock": "^5.4",
         "symfony/monolog-bundle": "^3.3",
         "symfony/requirements-checker": "^1.1",
-        "symfony/stopwatch": "^4.1",
-        "symfony/twig-bundle": "^4.0",
-        "symfony/yaml": "^4.0",
+        "symfony/stopwatch": "^5.4",
+        "symfony/twig-bundle": "^5.4",
+        "symfony/yaml": "^5.4",
         "twig/extensions": "^1.5",
         "webmozart/assert": "^1.4"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.0",
-        "infection/infection": "^0.14.1",
-        "php-coveralls/php-coveralls": "^1.0",
+        "infection/infection": "^0.27",
+        "php-coveralls/php-coveralls": "^2.6",
         "phpstan/phpstan": "^0.12.96",
         "phpunit/phpunit": "^8.3",
-        "symfony/web-profiler-bundle": "^4.1"
+        "symfony/web-profiler-bundle": "^6.0"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/*/*"
+        }
+    ],
     "config": {
         "preferred-install": {
             "*": "dist"
@@ -54,7 +59,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "symfony/flex": true,
-            "ocramius/package-versions": true
+            "ocramius/package-versions": true,
+            "infection/extension-installer": true
         }
     },
     "autoload": {
@@ -92,7 +98,9 @@
     "extra": {
         "symfony": {
             "id": "01C1JT3KH3RK0PXZY0AJCJSK3X",
-            "allow-contrib": true
+            "allow-contrib": true,
+            "require": "5.4.*"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
