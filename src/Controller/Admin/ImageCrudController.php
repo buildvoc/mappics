@@ -41,23 +41,31 @@ class ImageCrudController extends AbstractCrudController
         $description = TextField::new('description');
         $longDescription = TextField::new('longDescription');
         $createdAt = DateTimeField::new('createdAt');
-        $exifDataLatitude = NumberField::new('exifData.latitude');
-        $exifDataLongitude = NumberField::new('exifData.longitude');
-        $exifDataAltitude = TextField::new('exifData.altitude');
-        $exifDataMake = TextField::new('exifData.make');
-        $exifDataModel = TextField::new('exifData.model');
-        $exifDataExposure = TextField::new('exifData.exposure');
-        $exifDataAperture = TextField::new('exifData.aperture');
-        $exifDataFocalLength = TextField::new('exifData.focalLength');
+
+        $exifDataLatitude = NumberField::new('exifData.latitude', 'Latitude');
+        $exifDataLongitude = NumberField::new('exifData.longitude', 'Longitude');
+        $exifDataAltitude = TextField::new('exifData.altitude', 'Altitude');
+        $exifDataMake = TextField::new('exifData.make', 'Make');
+        $exifDataModel = TextField::new('exifData.model', 'Model');
+        $exifDataExposure = TextField::new('exifData.exposure', 'Exposure');
+        $exifDataAperture = TextField::new('exifData.aperture', 'Aperture');
+        $exifDataFocalLength = TextField::new('exifData.focalLength', 'Focal Length');
         $exifDataISO = TextField::new('exifData.ISO');
-        $exifDataTakenAt = DateTimeField::new('exifData.takenAt');
+        $exifDataTakenAt = DateTimeField::new('exifData.takenAt', 'Taken At');
+        $exifDataGpsImgDirection = NumberField::new('exifData.gpsImgDirection', 'GPS Image Direction');
+        $exifDataGpsLatitudeRef = TextField::new('exifData.gpsLatitudeRef', 'GPS Latitude Ref');
+        $exifDataGpsLongitudeRef = TextField::new('exifData.gpsLongitudeRef', 'GPS Longitude Ref');
+        $focalLengthIn35mmFilm = TextField::new('exifData.focalLengthIn35mmFilm', 'Focal Length in 35mm Film');
+
         $weatherDescription = TextField::new('weather.description');
-        $weatherTemperature = TextField::new('weather.temperature');
-        $weatherHumidity = TextField::new('weather.humidity');
-        $weatherPressure = TextField::new('weather.pressure');
-        $weatherWindSpeed = TextField::new('weather.windSpeed');
+        $weatherTemperature = NumberField::new('weather.temperature', 'Temperature');
+        $weatherHumidity = NumberField::new('weather.humidity', 'Humidity');
+        $weatherPressure = NumberField::new('weather.pressure', 'Pressure');
+        $weatherWindSpeed = NumberField::new('weather.windSpeed', 'Wind speed');
+
         $gallery = AssociationField::new('gallery');
         $id = TextField::new('id', 'ID');
+
         $galleryName = TextareaField::new('galleryName');
 
         if (Crud::PAGE_INDEX === $pageName) {
@@ -67,7 +75,28 @@ class ImageCrudController extends AbstractCrudController
         } elseif (Crud::PAGE_NEW === $pageName) {
             return [$filename, $resizedFilename, $thumbnailFilename, $description, $longDescription, $createdAt, $exifDataLatitude, $exifDataLongitude, $exifDataAltitude, $exifDataMake, $exifDataModel, $exifDataExposure, $exifDataAperture, $exifDataFocalLength, $exifDataISO, $exifDataTakenAt, $weatherDescription, $weatherTemperature, $weatherHumidity, $weatherPressure, $weatherWindSpeed, $gallery];
         } elseif (Crud::PAGE_EDIT === $pageName) {
-            return [$description, $longDescription, $exifDataLatitude, $exifDataLongitude, $exifDataTakenAt];
+            return [
+                $description,
+                $longDescription,
+
+                $weatherTemperature,
+                $weatherHumidity,
+                $weatherPressure,
+                $weatherWindSpeed,
+
+                $exifDataLatitude,
+                $exifDataLongitude,
+                $exifDataTakenAt,
+                $exifDataGpsImgDirection,
+                $exifDataGpsLatitudeRef,
+                $exifDataGpsLongitudeRef,
+                $focalLengthIn35mmFilm,
+                $exifDataLatitude,
+                $exifDataLongitude,
+                $exifDataAperture,
+                $exifDataFocalLength,
+                $exifDataISO,
+            ];
         }
     }
 }
