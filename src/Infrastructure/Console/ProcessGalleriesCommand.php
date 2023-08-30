@@ -51,12 +51,12 @@ class ProcessGalleriesCommand extends Command
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $stopwatch = new Stopwatch();
@@ -87,5 +87,7 @@ class ProcessGalleriesCommand extends Command
         $this->logger->info('Process galleries command ended - Duration: ' . $duration . ' sec - Memory: ' . $memory . ' kB');
 
         $this->release();
+
+        return Command::SUCCESS;
     }
 }
