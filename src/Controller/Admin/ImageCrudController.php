@@ -45,7 +45,7 @@ class ImageCrudController extends AbstractCrudController
 
         $exifDataLatitude = NumberField::new('exifData.latitude', 'Latitude');
         $exifDataLongitude = NumberField::new('exifData.longitude', 'Longitude');
-        $exifDataAltitude = TextField::new('exifData.altitude', 'Altitude');
+        $exifDataAltitude = NumberField::new('exifData.altitude', 'Altitude');
         $exifDataMake = TextField::new('exifData.make', 'Make');
         $exifDataModel = TextField::new('exifData.model', 'Model');
         $exifDataExposure = TextField::new('exifData.exposure', 'Exposure');
@@ -70,11 +70,65 @@ class ImageCrudController extends AbstractCrudController
         $galleryName = TextareaField::new('galleryName');
 
         if (Crud::PAGE_INDEX === $pageName) {
-            return [$thumbnailFilename, $filename, $description, $longDescription, $galleryName, $createdAt];
+            return [
+                $thumbnailFilename,
+                $filename,
+                $description,
+                $longDescription,
+                $galleryName,
+                $createdAt
+            ];
         } elseif (Crud::PAGE_DETAIL === $pageName) {
-            return [$id, $filename, $resizedFilename, $thumbnailFilename, $description, $longDescription, $createdAt, $exifDataLatitude, $exifDataLongitude, $exifDataAltitude, $exifDataMake, $exifDataModel, $exifDataExposure, $exifDataAperture, $exifDataFocalLength, $exifDataISO, $exifDataTakenAt, $weatherDescription, $weatherTemperature, $weatherHumidity, $weatherPressure, $weatherWindSpeed, $gallery];
+            return [
+                $id,
+                $filename,
+                $resizedFilename,
+                $thumbnailFilename,
+                $description,
+                $longDescription,
+                $createdAt,
+                $exifDataLatitude,
+                $exifDataLongitude,
+                $exifDataAltitude,
+                $exifDataMake,
+                $exifDataModel,
+                $exifDataExposure,
+                $exifDataAperture,
+                $exifDataFocalLength,
+                $exifDataISO,
+                $exifDataTakenAt,
+                $weatherDescription,
+                $weatherTemperature,
+                $weatherHumidity,
+                $weatherPressure,
+                $weatherWindSpeed,
+                $gallery
+            ];
         } elseif (Crud::PAGE_NEW === $pageName) {
-            return [$filename, $resizedFilename, $thumbnailFilename, $description, $longDescription, $createdAt, $exifDataLatitude, $exifDataLongitude, $exifDataAltitude, $exifDataMake, $exifDataModel, $exifDataExposure, $exifDataAperture, $exifDataFocalLength, $exifDataISO, $exifDataTakenAt, $weatherDescription, $weatherTemperature, $weatherHumidity, $weatherPressure, $weatherWindSpeed, $gallery];
+            return [
+                $filename,
+                $resizedFilename,
+                $thumbnailFilename,
+                $description,
+                $longDescription,
+                $createdAt,
+                $exifDataLatitude,
+                $exifDataLongitude,
+                $exifDataAltitude,
+                $exifDataMake,
+                $exifDataModel,
+                $exifDataExposure,
+                $exifDataAperture,
+                $exifDataFocalLength,
+                $exifDataISO,
+                $exifDataTakenAt,
+                $weatherDescription,
+                $weatherTemperature,
+                $weatherHumidity,
+                $weatherPressure,
+                $weatherWindSpeed,
+                $gallery
+            ];
         } elseif (Crud::PAGE_EDIT === $pageName) {
             return [
                 $description->setColumns('col-md-12'),
