@@ -38,7 +38,7 @@ class ImageCrudController extends AbstractCrudController
     {
         $filename = TextField::new('filename');
         $resizedFilename = TextField::new('resizedFilename');
-        $thumbnailFilename = ImageField::new('thumbnailFilename');
+        $thumbnailFilename = ImageField::new('thumbnailFilename')->setBasePath('../galleries/');
         $description = TextField::new('description');
         $longDescription = TextareaField::new('longDescription');
         $createdAt = DateTimeField::new('createdAt');
