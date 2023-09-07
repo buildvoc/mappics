@@ -16,7 +16,7 @@
         "doctrine/orm": "^2.16",
         "easycorp/easyadmin-bundle": "^4.7",
         "composer/package-versions-deprecated": "1.11.99.5",
-        "doctrine/common": "^2",
+        "doctrine/common": "^3.0",
         "gumlet/php-image-resize": "^1.9",
         "guzzlehttp/guzzle": "^6.3",
         "javiereguiluz/easyslugger": "^1.0",
@@ -85,7 +85,8 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
-            "requirements-checker": "script"
+            "requirements-checker": "script",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
