@@ -15,6 +15,8 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.16",
         "easycorp/easyadmin-bundle": "^4.7",
+        "composer/package-versions-deprecated": "1.11.99.5",
+        "doctrine/common": "^2",
         "gumlet/php-image-resize": "^1.9",
         "guzzlehttp/guzzle": "^6.3",
         "javiereguiluz/easyslugger": "^1.0",
