@@ -73,12 +73,23 @@ Steps to deploy code on production:
 3. Take pull using git pull command
 
 ## Run on your local machine
-### Option 1 
-XAMPP is being used for development purposes
-1. Clone project in C:/xampp/htdocs/ [Whatever directory you have xampp installed] directory. https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/7.4.33/xampp-windows-x64-7.4.33-0-VC15-installer.exe/download 
-2. Clone command: git clone https://github.com/buildvoc/mappics.git (second branch)
+### Option 1
+
+#### Windows Os:
+XAMPP is being used for development purposes [download](https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/7.4.33/xampp-windows-x64-7.4.33-0-VC15-installer.exe/download), 
+or you can use any other tool like [laragon](https://laragon.org/), it's very easy to setup and use.
+### Mac Os:
+Use [Herd](https://herd.laravel.com/), or [Valet](https://laravel.com/docs/master/valet) for Mac Os.
+
+>Use any tool you are comfortable with, but make sure you have PHP 7.4 or higher installed on your machine.
+
+>Make sure you have composer installed on your machine.
+
+### Steps to run on local machine:
+1. Clone project in `C:/xampp/htdocs/` [Whatever directory you have xampp installed] directory. 
+2. Clone command: git clone https://github.com/buildvoc/mappics.git (master branch)
 3. Go inside mappics directory and run composer install command
-4. Run mp_db.sql file in phpmyadmin or using heidisql tool or download https://www.phpmyadmin.net/ 
+4. Run mappics.sql file in phpmyadmin or using heidisql tool or [download](https://www.phpmyadmin.net/) 
 5. Open .env file and update your DB connection:
 6. DATABASE_URL="mysql://root:@localhost:3306/mp_db
 7. Run this command php -S localhost:8000 -t public/ to start server from root directory.
@@ -88,6 +99,7 @@ XAMPP is being used for development purposes
 11. Place your geojson file in `<root>/var/galleries` directory.
 11. run the console command `bin/console mappics:process-galleries` from the `<root>` directory
 12. go to the home page and enjoy your photos!
+13. To access the admin backend you must set the `ADMIN_PWD` variable in the `/.env` file, and then access it from `www.your-domain.com/admin`.
 
 ### Option 2
 The suggested way to run and work on Mappics in a local enviroment is [Docker](https://www.docker.com/):
