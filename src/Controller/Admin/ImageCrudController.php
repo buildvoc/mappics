@@ -24,7 +24,28 @@ class ImageCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setSearchFields(['id', 'filename', 'resizedFilename', 'thumbnailFilename', 'description', 'longDescription', 'exifData.latitude', 'exifData.longitude', 'exifData.altitude', 'exifData.make', 'exifData.model', 'exifData.exposure', 'exifData.aperture', 'exifData.focalLength', 'exifData.ISO', 'weather.description', 'weather.temperature', 'weather.humidity', 'weather.pressure', 'weather.windSpeed'])
+            ->setSearchFields([
+                'id',
+                'filename',
+                'resizedFilename',
+                'thumbnailFilename',
+                'description',
+                'longDescription',
+                'exifData.latitude',
+                'exifData.longitude',
+                'exifData.altitude',
+                'exifData.make',
+                'exifData.model',
+                'exifData.exposure',
+                'exifData.aperture',
+                'exifData.focalLength',
+                'exifData.ISO',
+                'weather.description',
+                'weather.temperature',
+                'weather.humidity',
+                'weather.pressure',
+                'weather.windSpeed',
+            ])
             ->setPaginatorPageSize(30);
     }
 
@@ -142,7 +163,6 @@ class ImageCrudController extends AbstractCrudController
 
                 FormField::addPanel('Exif Data'),
                 $exifDataLatitude->setColumns('col-md-4'),
-                $exifDataLongitude->setColumns('col-md-4'),
                 $exifDataTakenAt->setColumns('col-md-4'),
                 $exifDataGpsImgDirection->setColumns('col-md-4'),
                 $exifDataGpsLatitudeRef->setColumns('col-md-4'),
@@ -150,6 +170,7 @@ class ImageCrudController extends AbstractCrudController
                 $focalLengthIn35mmFilm->setColumns('col-md-4'),
                 $exifDataLatitude->setColumns('col-md-4'),
                 $exifDataLongitude->setColumns('col-md-4'),
+                $exifDataAltitude->setColumns('col-md-4'),
                 $exifDataAperture->setColumns('col-md-4'),
                 $exifDataFocalLength->setColumns('col-md-4'),
                 $exifDataISO->setColumns('col-md-4'),
